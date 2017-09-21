@@ -1,4 +1,5 @@
 /* pq.cpp
+<<<<<<< HEAD
  * Authors: Matthew D'Alonzo and Jeff Klouda
  * Multi-core process queue
  */
@@ -33,3 +34,23 @@ void usage() {
                 "    -p POLICY          Scheduling policy (fifo, rdrn, mlfq)\n"
                 "    -t MICROSECONDS    Time between scheduling             \n";
 }
+=======
+ * This is the main file for
+ * our process queue program.
+ * Authors: Jeff Klouda
+ *          Matthew D'Alonzo
+ */
+
+
+
+
+
+//Main Function
+int main(int argc, char* argv[]){
+
+
+
+	return 0; //successful completion
+}
+
+>>>>>>> 78a70a9e44fb00bb21bab816e283a133e8277e7f
