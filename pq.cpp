@@ -1,22 +1,25 @@
 /* pq.cpp
-<<<<<<< HEAD
  * Authors: Matthew D'Alonzo and Jeff Klouda
  * Multi-core process queue
  */
 
 #include <iostream>
-
-//  Global Variables
-int nCPUs = 1;
-enum Policy {fifo, rdrn, mlfq};
-Policy POLICY = fifo;
-unsigned int schedTime;         //  time between scheduling
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
+//  Global Variables
+int NCPUS = 1;
+enum Policy {fifo, rdrn, mlfq};
+Policy POLICY = fifo;
+unsigned int SCHEDTIME;         //  time between scheduling
+string PATH;
+
 //  Usage Function
-void usage() {
-    cout <<     "Usage: ./pq [options]                                      \n"
+void usage(string ProgramName) {
+    cout <<     "Usage: " << ProgramName << " [options]                     \n"
                 "                                                           \n"
                 "General Options:                                           \n"
                 "    -h                 Print this help message             \n"
@@ -34,23 +37,46 @@ void usage() {
                 "    -p POLICY          Scheduling policy (fifo, rdrn, mlfq)\n"
                 "    -t MICROSECONDS    Time between scheduling             \n";
 }
-=======
- * This is the main file for
- * our process queue program.
- * Authors: Jeff Klouda
- *          Matthew D'Alonzo
- */
 
-
-
-
-
-//Main Function
-int main(int argc, char* argv[]){
-
-
-
-	return 0; //successful completion
+int main(int argc, char *argv[]) {
+    
+    //  Command Line Parsing
+    string programName = argv[0];
+    int argIndex = 1;
+    string flag;
+    while (argIndex < (argc)) {
+        flag = argv[argIndex++];
+        if (flag == "-h") {
+            usage(programName);
+            return 0;
+        } else if (flag == "-f") {
+            PATH = argv[argIndex++];
+        } else if (flag == "-n") {
+            NCPUS = atoi(argv[argIndex++]);
+        } else if (flag == "-p") {
+            string pChoice = argv[argIndex++];
+            if (pChoice == "fifo") {
+                POLICY = fifo;
+            } else if (pChoice == "rdrn") {
+                POLICY = rdrn;
+            } else if (pChoice == "mlfq") {
+                POLICY = mlfq;
+            } else {
+                //  Invalid scheduling policy
+                usage(programName);
+                return 1;
+            }
+        } else if (flag == "-t") {
+            SCHEDTIME = atoi(argv[argIndex++]);
+        } else if (flag == "add") {
+            //  Run client
+        } else if ( flag == "status" || flag == "running" ||
+                    flag == "wating" || flag == "flush" ) {
+            //  Run client
+        } else {
+            usage(programName);
+            return 1;
+        }
+    }
+    return EXIT_SUCCESS;
 }
-
->>>>>>> 78a70a9e44fb00bb21bab816e283a133e8277e7f
