@@ -6,6 +6,10 @@
 #include <string>
 #include <stdio.h>
 #include <sys/types.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "pq.h"
 
 Scheduler::Scheduler() {
@@ -50,7 +54,7 @@ int Scheduler::executeJob (vector<string>) {
             break;
 
         case 0:             // Child
-            execvp(command_char[0], command_char);
+            //execvp(command_char[0], command_char);
             return -1;      // fail
             break;
 
