@@ -35,8 +35,8 @@ class Scheduler {
         Scheduler (Policy, int ncpus, int tmslice);
         ~Scheduler ();
         Process getProcess(pid_t);         
-        int addJob (string);                        // return error?
-        int executeJob (string);
+        void addJob (vector<string>);               
+        int executeJob (string);                    // return pid/-1
         int pauseProcess (Process);
         int resumeProcess (Process);
         int terminateProcess (Process);
@@ -47,7 +47,7 @@ class Scheduler {
         int nCPUS;
         int timeSlice;
         Policy policy;
-        vector<string> jobsWaiting;
+        vector<vector<string>> jobsWaiting;
         vector<Process> processTable;
 };
 
