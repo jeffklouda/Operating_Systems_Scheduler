@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#ifndef PQ_H
+#define PQ_H
+
 using namespace std;
 
 enum Policy { fifo, rdrn, mlfq };
@@ -46,3 +49,11 @@ class Scheduler {
         Policy policy;
         vector<Process> processTable;
 };
+
+//  ipc_communication.cpp
+
+void server_create();
+void server_accept();
+void client_request(vector<string>);
+
+#endif
