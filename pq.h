@@ -47,13 +47,14 @@ class Scheduler {
         int nCPUS;
         int timeSlice;
         Policy policy;
+        vector<string> jobsWaiting;
         vector<Process> processTable;
 };
 
 //  ipc_communication.cpp
 
 int server_create();
-void server_accept();
+void server_accept(int);
 void client_request(vector<string>);
 
 #endif
