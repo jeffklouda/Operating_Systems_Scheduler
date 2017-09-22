@@ -22,6 +22,10 @@
 
 using namespace std;
 
+#define streq(a, b) (strcmp(a, b) == 0)
+
+#define SOCKET_PATH "parrot.socket"
+
 int server_create(){
 	vector<string> messages;
 
@@ -50,12 +54,24 @@ int server_create(){
 	return server_fd;
 }
 
-void server_accept(){
+void server_accept(int server_fd){
+
+	 // Accept client
+     struct sockaddr_un client_addr;
+     socklen_t client_len = sizeof(struct sockaddr_un);
+     int       client_fd  = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
+
+     if (client_fd < 0) {
+         perror("accept");
+         return;
+     }
+
+
 	// Open stream from client
 	FILE *client_stream = fdopen(client_fd, "r+");
 	if (client_stream == NULL) {
 		perror("fdopen");
-		continue;
+		return;
 	}
 
 	// Parrot input
@@ -93,11 +109,10 @@ void client_request(vector<string> command){
 		exit(EXIT_FAILURE);
 	}
 
-	char buffer[BUFSIZ];
+	//char buffer[BUFSIZ];
 
-	for (int i = 0; i < command.size(); i++){
-		fgets(buffer, BUFSIZ, command[i].c_str());
-		fputs(buffer, server_stream);
+	for (uint i = 0; i < command.size(); i++){
+		fputs(command[i].c_str(), server_stream);
 	}
 
 	fclose(server_stream);
