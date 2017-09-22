@@ -22,7 +22,7 @@
 
 using namespace std;
 
-void server_create(){
+int server_create(){
 	vector<string> messages;
 
 	// Create socket
@@ -47,7 +47,7 @@ void server_create(){
 		exit(EXIT_FAILURE);
 	}
 
-
+	return server_fd;
 }
 
 void server_accept(){

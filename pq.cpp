@@ -70,9 +70,19 @@ int main(int argc, char *argv[]) {
             SCHEDTIME = atoi(argv[argIndex++]);
         } else if (flag == "add") {
             //  Run client
+			vector<string> command_request;
+			command_request.push_back(flag);
+            while (argIndex < (argc)){
+				flag = argv[argIndex++];
+				command_request.push_back(flag);
+			}
+			client_request(command_request);
         } else if ( flag == "status" || flag == "running" ||
                     flag == "waiting" || flag == "flush" ) {
             //  Run client
+			vector<string> command_request;
+			command_request.push_back(flag);
+			client_request(command_request);
         } else {
             usage(programName);
             return 1;
@@ -84,6 +94,8 @@ int main(int argc, char *argv[]) {
     cout << "SCHEDTIME: " << SCHEDTIME << endl;
     cout << "PATH: " << PATH << endl;
     */
+	int server_fd = server_create();
     
+
     return EXIT_SUCCESS;
 }
