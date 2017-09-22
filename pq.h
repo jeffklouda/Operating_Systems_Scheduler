@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <string>
 #include <vector>
+#include <queue>
 
 #ifndef PQ_H
 #define PQ_H
@@ -35,7 +36,9 @@ class Scheduler {
         Scheduler (Policy, int ncpus, int tmslice);
         ~Scheduler ();
         Process getProcess(pid_t);         
-        void addJob (vector<string>);               
+        bool jobsWaiting();                         // return true if jobs waiting
+        void pushJob (vector<string>);               
+        vector<string>  popJob();
         int executeJob (string);                    // return pid/-1
         int pauseProcess (Process);
         int resumeProcess (Process);
@@ -47,7 +50,7 @@ class Scheduler {
         int nCPUS;
         int timeSlice;
         Policy policy;
-        vector<vector<string>> jobsWaiting;
+        queue<vector<string>> jobsWaiting;
         vector<Process> processTable;
 };
 
