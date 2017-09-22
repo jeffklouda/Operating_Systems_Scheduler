@@ -51,7 +51,7 @@ class Scheduler {
         int nCPUS;
         int timeSlice;
         Policy policy;
-        queue<vector<string>> jobsWaiting;
+        queue<vector<string>> jobsWaitingTable;
         vector<Process> processTable;
 };
 
