@@ -5,6 +5,10 @@ LXXFLAGS = -L.
 
 all: pq
 
+scheduler.o: scheduler.cpp pq.h
+	@echo "Compiling $@"
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+
 pq.o: pq.cpp pq.h
 	@echo "Compiling $@"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -13,7 +17,7 @@ ipc_communication.o: ipc_communication.cpp pq.h
 	@echo "Compiling $@"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-pq: pq.o ipc_communication.o
+pq: pq.o ipc_communication.o scheduler.o
 	@echo "Linking $@..."
 	@$(LXX) $(LXXFLAGS) -o $@ $^
 
