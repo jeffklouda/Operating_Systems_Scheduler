@@ -9,7 +9,11 @@ pq.o: pq.cpp pq.h
 	@echo "Compiling $@"
 	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-pq: pq.o
+ipc_communication.o: ipc_communication.cpp pq.h
+	@echo "Compiling $@"
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+pq: pq.o ipc_communication.o
 	@echo "Linking $@..."
 	@$(LXX) $(LXXFLAGS) -o $@ $^
 
