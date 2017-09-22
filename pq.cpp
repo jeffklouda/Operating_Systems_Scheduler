@@ -14,8 +14,8 @@ using namespace std;
 int NCPUS = 1;
 enum Policy {fifo, rdrn, mlfq};
 Policy POLICY = fifo;
-unsigned int SCHEDTIME;         //  time between scheduling
-string PATH;
+unsigned int SCHEDTIME = 100;         //  time between scheduling
+string PATH = "./";
 
 //  Usage Function
 void usage(string ProgramName) {
@@ -71,12 +71,19 @@ int main(int argc, char *argv[]) {
         } else if (flag == "add") {
             //  Run client
         } else if ( flag == "status" || flag == "running" ||
-                    flag == "wating" || flag == "flush" ) {
+                    flag == "waiting" || flag == "flush" ) {
             //  Run client
         } else {
             usage(programName);
             return 1;
         }
     }
+    /*  Debug command line options
+    cout << "NCPUS: " << NCPUS << endl;
+    cout << "POLICY: " << POLICY << endl;
+    cout << "SCHEDTIME: " << SCHEDTIME << endl;
+    cout << "PATH: " << PATH << endl;
+    */
+    
     return EXIT_SUCCESS;
 }
