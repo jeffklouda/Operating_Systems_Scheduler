@@ -39,7 +39,9 @@ void usage(string ProgramName) {
 }
 
 int main(int argc, char *argv[]) {
-    
+
+	vector<string> command_request;    
+
     //  Command Line Parsing
     string programName = argv[0];
     int argIndex = 1;
@@ -70,19 +72,19 @@ int main(int argc, char *argv[]) {
             SCHEDTIME = atoi(argv[argIndex++]);
         } else if (flag == "add") {
             //  Run client
-			vector<string> command_request;
 			command_request.push_back(flag);
             while (argIndex < (argc)){
 				flag = argv[argIndex++];
 				command_request.push_back(flag);
 			}
 			client_request(command_request);
+			return EXIT_SUCCESS;
         } else if ( flag == "status" || flag == "running" ||
                     flag == "waiting" || flag == "flush" ) {
             //  Run client
-			vector<string> command_request;
 			command_request.push_back(flag);
 			client_request(command_request);
+			return EXIT_SUCCESS;
         } else {
             usage(programName);
             return 1;
