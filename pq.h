@@ -52,7 +52,7 @@ class Scheduler {
 
 //  ipc_communication.cpp
 
-void server_create();
+int server_create();
 void server_accept();
 void client_request(vector<string>);
 
