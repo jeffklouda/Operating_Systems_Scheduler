@@ -2,6 +2,7 @@
  * Authors: Matthew D'Alonzo and Jeff Klouda
  * Multi-core process queue
  */
+#include "pq.h"
 
 #include <iostream>
 #include <string>
@@ -12,7 +13,6 @@ using namespace std;
 
 //  Global Variables
 int NCPUS = 1;
-enum Policy {fifo, rdrn, mlfq};
 Policy POLICY = fifo;
 unsigned int SCHEDTIME = 100;         //  time between scheduling
 string PATH = "./";
