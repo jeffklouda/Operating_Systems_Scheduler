@@ -33,13 +33,14 @@ struct Process {
 class Scheduler {
 
     public:
-        Scheduler (Policy, int ncpus, int tmslice);
+        Scheduler ();
         ~Scheduler ();
+        void setSchedulerVals (Policy, int ncpus, int tmslice);
         Process getProcess(pid_t);         
         bool jobsWaiting();                         // return true if jobs waiting
         void pushJob (vector<string>);               
         vector<string>  popJob();
-        int executeJob (string);                    // return pid/-1
+        int executeJob (vector<string>);            // return pid/-1
         int pauseProcess (Process);
         int resumeProcess (Process);
         int terminateProcess (Process);
