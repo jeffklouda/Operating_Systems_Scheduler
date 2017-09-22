@@ -24,15 +24,15 @@ void Scheduler::setSchedulerVals(Policy p, int ncpus, int tmslice) {
     timeSlice = tmslice;
 }
 
-bool jobsWaiting() {
+bool Scheduler::jobsWaiting() {
     return (!jobsWaitingTable.empty());
 }
 
-void Scheduler::addJob (vector<string> job) {
+void Scheduler::pushJob (vector<string> job) {
     jobsWaitingTable.push(job);
 }
 
-vector<string> popJob() {
+vector<string> Scheduler::popJob() {
     vector<string> job = jobsWaitingTable.front();
     jobsWaitingTable.pop();
     return job;
@@ -48,7 +48,15 @@ int Scheduler::executeJob (vector<string>) {
             fprintf(stderr, "Unable to fork: %s\n", strerror(errno));
             return -1;
             break;
-        case 0:
+
+        case 0:             // Child
+            execvp(command_char[0], command_char);
+            return -1;      // fail
+            break;
+
+        default:            // Parent
+            wait (NULL);
+            break;
     }
 
     return -1;
