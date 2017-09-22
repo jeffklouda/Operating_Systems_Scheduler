@@ -132,13 +132,18 @@ Response.
 >
 >   - How will you multiplex I/O and computation?
 >
->	
+>	We will do this using the poll() command, which will determine when processes want to conduct I/O. We can then switch to another process when they block computation operations.
 >
 >   - How will you ensure that your I/O will not block indefinitely?
+>
+>	We will set up a timer interrupt to ensure that the I/O completes in a timely manner.
 >
 >   - How will you allow events such as a child process dying interrupt your
 >     I/O, but block such an event from interrupting your normal scheduling
 >     functions?  Why would this be necessary?
+>
+>	
+>
 
 Response.
 
