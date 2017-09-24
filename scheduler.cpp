@@ -16,7 +16,12 @@ Scheduler::Scheduler() {
     policy = fifo;
     nCPUS = 1;
     timeSlice = 100;
-	total_processes = 0;
+    total_processes = 0;
+    num_running_processes = 0;
+    num_waiting_processes = 0;
+    num_levels = 8;
+    average_turnaround_time = 0;
+    average_response_time = 0;
 }
 
 Scheduler::~Scheduler() {
@@ -74,4 +79,44 @@ int Scheduler::get_total_processes(){
 
 void Scheduler::set_total_processes(int num){
 	total_processes = num;
+}
+
+int Scheduler::get_num_running_processes(){
+	return num_running_processes;
+}
+
+void Scheduler::set_num_running_processes(int num){
+	num_running_processes = num;
+}
+
+int Scheduler::get_num_waiting_processes(){
+	return num_waiting_processes;
+}
+
+void Scheduler::set_num_waiting_processes(int num){
+	num_waiting_processes = num;
+}
+
+int Scheduler::get_num_levels(){
+	return num_levels;
+}
+
+void Scheduler::set_num_levels(int num){
+	num_levels = num;
+}
+
+int Scheduler::get_average_turnaround_time(){
+	return average_turnaround_time;
+}
+
+void Scheduler::set_average_turnaround_time(int num){
+	average_turnaround_time = num;
+}
+
+int Scheduler::get_average_response_time(){
+	return average_response_time;
+}
+
+void Scheduler::set_average_response_time(int num){
+	average_response_time = num;
 }

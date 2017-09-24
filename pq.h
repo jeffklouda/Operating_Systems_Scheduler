@@ -40,15 +40,30 @@ class Scheduler {
         bool jobsWaiting();                         // return true if jobs waiting
         void pushJob (vector<string>);               
         vector<string>  popJob();
-        int executeJob (vector<string>);            // return pid/-1
-        int pauseProcess (Process);
-        int resumeProcess (Process);
-        int terminateProcess (Process);
+        int  executeJob (vector<string>);            // return pid/-1
+        int  pauseProcess (Process);
+        int  resumeProcess (Process);
+        int  terminateProcess (Process);
         void run();                                 // run scheduler
-        int get_total_processes();
-		void set_total_processes(int);
+        int  get_total_processes();
+	void set_total_processes(int);
+	int  get_num_running_processes();
+	void set_num_running_processes(int);
+	int  get_num_waiting_processes();
+	void set_num_waiting_processes(int);
+	int  get_num_levels();
+	void set_num_levels(int);
+	int  get_average_turnaround_time();
+	void set_average_turnaround_time(int);
+	int  get_average_response_time();
+	void set_average_response_time(int);
     private:
-		int total_processes;
+	int total_processes;
+	int num_running_processes;
+	int num_waiting_processes;
+	int num_levels;
+	int average_turnaround_time;
+	int average_response_time;
         int nCPUS;
         int timeSlice;
         Policy policy;

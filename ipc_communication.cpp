@@ -23,13 +23,15 @@
 
 #include <poll.h>
 
+#include <iostream>
+
 extern Scheduler scheduler_prime;
 
 using namespace std;
 
 #define streq(a, b) (strcmp(a, b) == 0)
 
-#define SOCKET_PATH "parrot.socket"
+#define SOCKET_PATH "pq.mdalonz1"
 
 int server_create(){
 	vector<string> messages;
@@ -60,7 +62,6 @@ int server_create(){
 }
 
 void server_accept(int server_fd){
-
 	 // Accept client
      struct sockaddr_un client_addr;
      socklen_t client_len = sizeof(struct sockaddr_un);
@@ -84,12 +85,26 @@ void server_accept(int server_fd){
 	while (fgets(buffer, BUFSIZ, client_stream)) {
 		command.push_back(buffer);
 	}
-
+	for (uint i = 0; i < command.size(); i++){
+		command[i].pop_back();
+	}
+	//cout << "command size " << command.size() << endl;
+	//cout << "command[0]: (" << command[0] << ")" << endl;
 	if (command[0] == "add" && command.size() > 1){
+		//cout << "in here" << endl;
 		command.erase(command.begin());
 		scheduler_prime.pushJob(command);
 		add_log(command);
 		scheduler_prime.set_total_processes(scheduler_prime.get_total_processes()+1);
+		scheduler_prime.set_num_waiting_processes(scheduler_prime.get_num_waiting_processes()+1);
+	}else if (command[0] == "status"){
+		status_log();
+	}else if (command[0] == "running"){
+		running_log();
+	}else if (command[0] == "waiting"){
+		waiting_log();
+	}else if (command[0] == "flush"){
+		flush_log();
 	}
 	
 	fclose(client_stream);
@@ -122,9 +137,10 @@ void client_request(vector<string> command){
 	}
 
 	//char buffer[BUFSIZ];
-
+	string new_line = "\n";
 	for (uint i = 0; i < command.size(); i++){
 		fputs(command[i].c_str(), server_stream);
+		fputs(new_line.c_str(), server_stream);
 	}
 
 	fclose(server_stream);

@@ -5,6 +5,7 @@
  * Authors: Matthew D'Alonzo and Jeff Klouda
  */
 
+#include <time.h>
 #include "pq.h"
 #include <iostream>
 #include <iomanip>
@@ -20,24 +21,54 @@ void add_log(vector<string> command_vector){
 		}
 		command_string += command_vector[i];
 	}
-	cout << "Added process " << scheduler_prime.get_total_processes() << ": " << command_string << endl;
+	cout << "[" << time(NULL) << "] " << "INFO  Added process " << scheduler_prime.get_total_processes() << ": " << command_string << endl;
 }
 
 void status_log(){
-
+        cout << endl;	
+        cout << "Running =";
+	cout << setw(5);
+	cout << scheduler_prime.get_num_running_processes();
+	cout << ", Waiting =";
+	cout << setw(5);
+	cout << scheduler_prime.get_num_waiting_processes();
+	cout << ", Levels =";
+	cout << setw(5);
+	cout << scheduler_prime.get_num_levels();
+	cout << ", Turnaround =";
+	cout << setw(5);
+        cout << scheduler_prime.get_average_turnaround_time();
+	cout << ", Response =";
+	cout << setw(5);
+	cout << scheduler_prime.get_average_response_time();
+	cout << endl;	
+	cout << endl;
+	cout << "Running Queue:" << endl;
+	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " << endl;
+	//TODO: Write in loop to list Running Processes
+	cout << endl;
+	cout << "Waiting Queue:" << endl;
+	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+<< endl;
+	//TODO: Write in loop to list Waiting Processes	
 
 }
 
 void running_log(){
-
-
+        cout << endl;
+	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+<< endl;
+	//TODO: Write in loop to list Running Processes
 }
 
 void waiting_log(){
-
-
+        cout << endl;
+	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+<< endl;
+	//TODO: Write in loop to list Waiting Processes
 }
 
 void flush_log(){
-
+	cout << endl;
+	cout << "Flushed " << scheduler_prime.get_num_running_processes() << " running and " << scheduler_prime.get_num_waiting_processes() << " waiting processes" << endl;
 }
