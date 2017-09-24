@@ -4,6 +4,7 @@
  * Authors: Matthew D'Alonzo and Jeff Klouda
  */
 
+#include "pq.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,10 @@
 
 #include <string>
 #include <vector>
+
+#include <poll.h>
+
+extern Scheduler scheduler_prime;
 
 using namespace std;
 
@@ -76,10 +81,16 @@ void server_accept(int server_fd){
 
 	// Parrot input
 	char buffer[BUFSIZ];
+	vector<string> command;
 	while (fgets(buffer, BUFSIZ, client_stream)) {
-		fputs(buffer, client_stream);
+		command.push_back(buffer);
 	}
 
+	if (command[0] == "add" && command.size() > 1){
+		command.erase(command.begin());
+		scheduler_prime.pushJob(command);
+	}
+	
 	fclose(client_stream);
 	close(client_fd);
 }

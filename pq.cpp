@@ -8,6 +8,8 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <poll.h>
+#include <string.h>
 
 using namespace std;
 
@@ -16,6 +18,8 @@ int NCPUS = 1;
 Policy POLICY = fifo;
 unsigned int SCHEDTIME = 100;         //  time between scheduling
 string PATH = "./";
+int POLL_TIMEOUT = 1000;
+Scheduler scheduler_prime; 
 
 //  Usage Function
 void usage(string ProgramName) {
@@ -97,7 +101,20 @@ int main(int argc, char *argv[]) {
     cout << "PATH: " << PATH << endl;
     */
 	int server_fd = server_create();
-    
+	scheduler_prime.setSchedulerVals(POLICY, NCPUS, SCHEDTIME);
+	while (true){
+		struct pollfd pfd = {server_fd, POLLIN|POLLPRI, 0};
+        int    result     = poll(&pfd, 1, POLL_TIMEOUT);
+		
+		if (result < 0){
+			fprintf(stderr, "Unable to poll: %s\n", strerror(errno));
+		} else if (result > 0){
+			server_accept(server_fd);
+		}
+		
+
+	}    
+
 
     return EXIT_SUCCESS;
 }
