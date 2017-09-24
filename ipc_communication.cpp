@@ -79,7 +79,6 @@ void server_accept(int server_fd){
 		return;
 	}
 
-	// Parrot input
 	char buffer[BUFSIZ];
 	vector<string> command;
 	while (fgets(buffer, BUFSIZ, client_stream)) {
@@ -89,6 +88,8 @@ void server_accept(int server_fd){
 	if (command[0] == "add" && command.size() > 1){
 		command.erase(command.begin());
 		scheduler_prime.pushJob(command);
+		add_log(command);
+		scheduler_prime.set_total_processes(scheduler_prime.get_total_processes()+1);
 	}
 	
 	fclose(client_stream);

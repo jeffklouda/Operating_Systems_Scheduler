@@ -16,6 +16,7 @@ Scheduler::Scheduler() {
     policy = fifo;
     nCPUS = 1;
     timeSlice = 100;
+	total_processes = 0;
 }
 
 Scheduler::~Scheduler() {
@@ -33,6 +34,7 @@ bool Scheduler::jobsWaiting() {
 }
 
 void Scheduler::pushJob (vector<string> job) {
+
     jobsWaitingTable.push(job);
 }
 
@@ -64,4 +66,12 @@ int Scheduler::executeJob (vector<string>) {
     }
 
     return -1;
+}
+
+int Scheduler::get_total_processes(){
+	return total_processes;
+}
+
+void Scheduler::set_total_processes(int num){
+	total_processes = num;
 }

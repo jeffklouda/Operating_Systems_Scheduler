@@ -45,9 +45,10 @@ class Scheduler {
         int resumeProcess (Process);
         int terminateProcess (Process);
         void run();                                 // run scheduler
-        
-
+        int get_total_processes();
+		void set_total_processes(int);
     private:
+		int total_processes;
         int nCPUS;
         int timeSlice;
         Policy policy;
@@ -60,5 +61,12 @@ class Scheduler {
 int server_create();
 void server_accept(int);
 void client_request(vector<string>);
+
+// logging.cpp
+void add_log(vector<string>);
+void status_log();
+void running_log();
+void waiting_log();
+void flush_log();
 
 #endif

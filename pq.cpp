@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <poll.h>
 #include <string.h>
-
+#include <time.h>
 using namespace std;
 
 //  Global Variables
@@ -102,6 +102,7 @@ int main(int argc, char *argv[]) {
     */
 	int server_fd = server_create();
 	scheduler_prime.setSchedulerVals(POLICY, NCPUS, SCHEDTIME);
+	cout << "[" << time(NULL) << "] " << "INFO  Starting Process Queue Server..." << endl;
 	while (true){
 		struct pollfd pfd = {server_fd, POLLIN|POLLPRI, 0};
         int    result     = poll(&pfd, 1, POLL_TIMEOUT);
