@@ -106,7 +106,6 @@ void server_accept(int server_fd){
 	fflush(client_stream);
 	cout << "After this thing" << endl;
 	*/
-    cout << "Check this out kiddo\n";
     char buffer[BUFSIZ];
     if (recv(client_fd, buffer, BUFSIZ, 0) < 0) {
         perror("recv");
@@ -114,14 +113,12 @@ void server_accept(int server_fd){
     int commandNo = atoi(buffer);
     for (int i = 0; i < commandNo; ++i) {
         int n = recv(client_fd, buffer, BUFSIZ, 0);
-        cout << n << endl;
         if (n < 0)
             perror("recv");
         else {
             command.push_back(buffer);
         }
     }
-    cout << "Recieved client\n"; 
     //cout << "command size here: " << command.size() << endl;
 	for (uint i = 0; i < command.size(); i++){
 		command[i].pop_back();
@@ -204,9 +201,7 @@ void client_request(vector<string> command){
         if (send(client_fd, buffer, BUFSIZ, 0) < 0) {
             perror("send");
         }
-        cout << "Bottom of loop\n";
     }
-    cout << "Done sending\n";
 
     /*
     for (uint i = 0; i < command.size(); i++){
