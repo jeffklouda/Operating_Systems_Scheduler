@@ -2,6 +2,7 @@
  *
  */
 
+#include <time.h>
 #include <vector>
 #include <string>
 #include <stdio.h>
@@ -39,19 +40,22 @@ bool Scheduler::jobsWaiting() {
 }
 
 void Scheduler::pushJob (vector<string> job) {
-
-    jobsWaitingTable.push(job);
+	Process unrun_process = {job, 0, ready, -1, 0, 0, 0, 0, 0, time(NULL), 0};
+    jobsWaitingTable.push_front(unrun_process);
 }
 
 vector<string> Scheduler::popJob() {
-    vector<string> job = jobsWaitingTable.front();
-    jobsWaitingTable.pop();
+    vector<string> job = jobsWaitingTable.front().command;
+    jobsWaitingTable.pop_front();
     return job;
 }
 
-int Scheduler::executeJob (vector<string>) {
-    vector<string> job = jobsWaitingTable.front();
-    jobsWaitingTable.pop();
+int Scheduler::executeJob () {
+    vector<string> job = jobsWaitingTable.front().command;
+    processTable.push_back(jobsWaitingTable.front());
+	jobsWaitingTable.pop_front();
+	num_waiting_processes--;
+	num_running_processes++;
     pid_t pid = fork();
     
     switch (pid) {
@@ -71,6 +75,14 @@ int Scheduler::executeJob (vector<string>) {
     }
 
     return -1;
+}
+
+Policy Scheduler::get_policy(){
+	return policy;
+}
+
+int Scheduler::get_nCPUS(){
+	return nCPUS;
 }
 
 int Scheduler::get_total_processes(){
@@ -119,4 +131,12 @@ int Scheduler::get_average_response_time(){
 
 void Scheduler::set_average_response_time(int num){
 	average_response_time = num;
+}
+
+deque<Process> Scheduler::get_jobsWaitingTable(){
+	return jobsWaitingTable;
+}
+
+vector<Process> Scheduler::get_processTable(){
+	return processTable;
 }

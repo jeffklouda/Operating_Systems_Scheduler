@@ -62,6 +62,8 @@ int server_create(){
 }
 
 void server_accept(int server_fd){
+	
+
 	 // Accept client
      struct sockaddr_un client_addr;
      socklen_t client_len = sizeof(struct sockaddr_un);
@@ -71,6 +73,13 @@ void server_accept(int server_fd){
          perror("accept");
          return;
      }
+
+	// Open stream from client
+	//FILE *server_stream = fdopen(server_fd, "r+");
+	//if (server_stream == NULL) {
+	//	perror("fdopen");
+	//	return;
+	//}
 
 
 	// Open stream from client
@@ -82,19 +91,22 @@ void server_accept(int server_fd){
 
 	char buffer[BUFSIZ];
 	vector<string> command;
+	//cout << "server_fd for server: " << server_fd << endl;
+	//cout << "client_fd for server: " << client_fd << endl;
+	//cout << "before this thing" << endl;
 	while (fgets(buffer, BUFSIZ, client_stream)) {
 		command.push_back(buffer);
 	}
+	//cout << "After this thing" << endl;
+	//cout << "command size here: " << command.size() << endl;
 	for (uint i = 0; i < command.size(); i++){
 		command[i].pop_back();
 	}
-	//cout << "command size " << command.size() << endl;
-	//cout << "command[0]: (" << command[0] << ")" << endl;
 	if (command[0] == "add" && command.size() > 1){
 		//cout << "in here" << endl;
 		command.erase(command.begin());
 		scheduler_prime.pushJob(command);
-		add_log(command);
+		add_log(command, client_stream);
 		scheduler_prime.set_total_processes(scheduler_prime.get_total_processes()+1);
 		scheduler_prime.set_num_waiting_processes(scheduler_prime.get_num_waiting_processes()+1);
 	}else if (command[0] == "status"){
@@ -106,7 +118,7 @@ void server_accept(int server_fd){
 	}else if (command[0] == "flush"){
 		flush_log();
 	}
-	
+	//fclose(server_stream);
 	fclose(client_stream);
 	close(client_fd);
 }
@@ -130,6 +142,7 @@ void client_request(vector<string> command){
 	}
 
 	// Open stream from server
+	//cout << "client_fd for client: " << client_fd << endl;
 	FILE *server_stream = fdopen(client_fd, "r+");
 	if (server_stream == NULL) {
 		perror("fdopen");
@@ -139,10 +152,17 @@ void client_request(vector<string> command){
 	//char buffer[BUFSIZ];
 	string new_line = "\n";
 	for (uint i = 0; i < command.size(); i++){
+		//cout << "command[" << i << "]: " << command[i] << endl;
 		fputs(command[i].c_str(), server_stream);
 		fputs(new_line.c_str(), server_stream);
 	}
-
+	//cout << "after first" << endl;
+    //char buffer[BUFSIZ];
+   	//while (fgets(buffer, BUFSIZ, server_stream)) {
+    //    fputs(buffer, stdout);
+   	//}
+	//cout << "after here" << endl;
+	
 	fclose(server_stream);
 	close(client_fd);
 

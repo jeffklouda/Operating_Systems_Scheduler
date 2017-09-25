@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <deque>
+#include <stdio.h>
 
 #ifndef PQ_H
 #define PQ_H
@@ -26,8 +28,8 @@ struct Process {
     unsigned int cutime;    //  Waited-for children's user mode CPU time
     unsigned int cstime;    //  Waited-for children's kernel mode CPU time
     unsigned int starttime; //  Time when process started in clock ticks
-    unsigned int schedtime; //  Time when process was first scheduled
-
+    time_t schedtime; //  Time when process was first scheduled
+	int user;
 };
 
 class Scheduler {
@@ -40,34 +42,38 @@ class Scheduler {
         bool jobsWaiting();                         // return true if jobs waiting
         void pushJob (vector<string>);               
         vector<string>  popJob();
-        int  executeJob (vector<string>);            // return pid/-1
+        int  executeJob ();            // return pid/-1
         int  pauseProcess (Process);
         int  resumeProcess (Process);
         int  terminateProcess (Process);
         void run();                                 // run scheduler
-        int  get_total_processes();
-	void set_total_processes(int);
-	int  get_num_running_processes();
-	void set_num_running_processes(int);
-	int  get_num_waiting_processes();
-	void set_num_waiting_processes(int);
-	int  get_num_levels();
-	void set_num_levels(int);
-	int  get_average_turnaround_time();
-	void set_average_turnaround_time(int);
-	int  get_average_response_time();
-	void set_average_response_time(int);
+		Policy get_policy();  
+		int  get_nCPUS();    
+		int  get_total_processes();
+		void set_total_processes(int);
+		int  get_num_running_processes();
+		void set_num_running_processes(int);
+		int  get_num_waiting_processes();
+		void set_num_waiting_processes(int);
+		int  get_num_levels();
+		void set_num_levels(int);
+		int  get_average_turnaround_time();
+		void set_average_turnaround_time(int);
+		int  get_average_response_time();
+		void set_average_response_time(int);
+		deque<Process> get_jobsWaitingTable(); 
+		vector<Process> get_processTable();
     private:
-	int total_processes;
-	int num_running_processes;
-	int num_waiting_processes;
-	int num_levels;
-	int average_turnaround_time;
-	int average_response_time;
+		int total_processes;
+		int num_running_processes;
+		int num_waiting_processes;
+		int num_levels;
+		int average_response_time;
+		int average_turnaround_time;
         int nCPUS;
         int timeSlice;
         Policy policy;
-        queue<vector<string>> jobsWaitingTable;
+        deque<Process> jobsWaitingTable;
         vector<Process> processTable;
 };
 
@@ -78,10 +84,13 @@ void server_accept(int);
 void client_request(vector<string>);
 
 // logging.cpp
-void add_log(vector<string>);
+void add_log(vector<string>, FILE *);
 void status_log();
 void running_log();
 void waiting_log();
 void flush_log();
+
+// fifo.cpp
+void fifo_runner();
 
 #endif
