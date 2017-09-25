@@ -52,6 +52,7 @@ void sigchld_handler(int signum){
         for (uint i = 0; i < scheduler_prime.get_processTable().size(); i++){
             if (scheduler_prime.get_processTable()[i].pid == p){
                  reap_log(scheduler_prime.get_processTable()[i]);
+		 scheduler_prime.remove_process(i);
             }
         }
     }

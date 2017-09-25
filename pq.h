@@ -42,6 +42,7 @@ class Scheduler {
         bool jobsWaiting();                         // return true if jobs waiting
         void pushJob (vector<string>);               
         vector<string>  popJob();
+	Process remove_process(int);
         int  executeJob ();            // return pid/-1
         int  pauseProcess (Process);
         int  resumeProcess (Process);

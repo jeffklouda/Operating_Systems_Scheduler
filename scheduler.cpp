@@ -50,6 +50,12 @@ vector<string> Scheduler::popJob() {
     return job;
 }
 
+Process Scheduler::remove_process(int index){
+	Process removed_process = processTable[index];
+	processTable.erase(processTable.begin()+index);
+	return removed_process;
+}
+
 //executeJob()
 //This does the fork() and exec() on jobs
 //in the waiting queue.
