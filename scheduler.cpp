@@ -50,12 +50,24 @@ vector<string> Scheduler::popJob() {
     return job;
 }
 
+//executeJob()
+//This does the fork() and exec() on jobs
+//in the waiting queue.
 int Scheduler::executeJob () {
+    
     vector<string> job = jobsWaitingTable.front().command;
     processTable.push_back(jobsWaitingTable.front());
-	jobsWaitingTable.pop_front();
-	num_waiting_processes--;
-	num_running_processes++;
+    jobsWaitingTable.pop_front();
+
+    vector<char*> exec_command;
+    for (uint i = 0; i < job.size(); i++){
+        exec_command.push_back(const_cast<char*>(job[i].c_str()));
+    }
+    exec_command.push_back(NULL);
+    char **command_char = &exec_command[0];
+
+    num_waiting_processes--;
+    num_running_processes++;
     pid_t pid = fork();
     
     switch (pid) {
@@ -65,12 +77,12 @@ int Scheduler::executeJob () {
             break;
 
         case 0:             // Child
-            //execvp(command_char[0], command_char);
+            execvp(command_char[0], command_char);
             return -1;      // fail
             break;
 
         default:            // Parent
-            wait (NULL);
+            //wait (NULL);
             break;
     }
 
