@@ -4,6 +4,7 @@
  */
 #include "pq.h"
 
+#include <signal.h>
 #include <iostream>
 #include <string>
 #include <stdio.h>
@@ -11,6 +12,8 @@
 #include <poll.h>
 #include <string.h>
 #include <time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 using namespace std;
 
 //  Global Variables
@@ -40,6 +43,21 @@ void usage(string ProgramName) {
                 "    -n NCPUS           Number of CPUs                      \n"
                 "    -p POLICY          Scheduling policy (fifo, rdrn, mlfq)\n"
                 "    -t MICROSECONDS    Time between scheduling             \n";
+}
+
+void sigchld_handler(int signum){
+    pid_t p;
+    int status;
+    while ((p=waitpid(-1, &status, WNOHANG)) != -1){
+        for (uint i = 0; i < scheduler_prime.get_processTable().size(); i++){
+            if (scheduler_prime.get_processTable()[i].pid == p){
+                 reap_log(scheduler_prime.get_processTable()[i]);
+            }
+        }
+    }
+    wait(NULL);
+    scheduler_prime.set_num_running_processes(scheduler_prime.get_num_running_processes()-1);
+
 }
 
 int main(int argc, char *argv[]) {
@@ -104,7 +122,7 @@ int main(int argc, char *argv[]) {
 	scheduler_prime.setSchedulerVals(POLICY, NCPUS, SCHEDTIME);
 	cout << "[" << time(NULL) << "] " << "INFO  Starting Process Queue Server..." << endl;
 	while (true){
-		
+		signal(SIGCHLD, sigchld_handler);
 		if (scheduler_prime.get_policy() == fifo){
 			fifo_runner();
 		}

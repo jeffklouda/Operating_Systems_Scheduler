@@ -152,3 +152,4 @@ deque<Process> Scheduler::get_jobsWaitingTable(){
 vector<Process> Scheduler::get_processTable(){
 	return processTable;
 }
+

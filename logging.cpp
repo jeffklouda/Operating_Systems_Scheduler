@@ -168,3 +168,16 @@ void flush_log(){
 	cout << endl;
 	cout << "Flushed " << scheduler_prime.get_num_running_processes() << " running and " << scheduler_prime.get_num_waiting_processes() << " waiting processes" << endl;
 }
+
+
+void reap_log(Process reaped_process){
+        string process_string = "";
+        for (uint i = 0; i < reaped_process.command.size(); i++){
+		if (i != 0){
+			process_string += " ";
+		}
+        	process_string += reaped_process.command[i];
+        }
+	//TODO: Calculate Turnaround Time and Response Time
+	cout << "[" << time(NULL) << "] INFO  Reaped Process " << reaped_process.pid << ": " << process_string << ", Turnaround= " << ", Reponse= " << endl;
+}
