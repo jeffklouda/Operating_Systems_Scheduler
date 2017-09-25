@@ -110,7 +110,9 @@ void add_log(vector<string> command_vector, FILE* client_stream){
 	total_string += command_string;
 	total_string += "\n";
 	cout << total_string <<endl;
+	//fflush(client_stream);	
 	//fputs(total_string.c_str(), client_stream);
+	//fflush(client_stream);
 	//cout << "HERE33" <<endl;
 }
 

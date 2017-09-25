@@ -93,11 +93,13 @@ void server_accept(int server_fd){
 	vector<string> command;
 	//cout << "server_fd for server: " << server_fd << endl;
 	//cout << "client_fd for server: " << client_fd << endl;
-	//cout << "before this thing" << endl;
+	cout << "before this thing" << endl;
+	//fflush(client_stream);
 	while (fgets(buffer, BUFSIZ, client_stream)) {
 		command.push_back(buffer);
 	}
-	//cout << "After this thing" << endl;
+	fflush(client_stream);
+	cout << "After this thing" << endl;
 	//cout << "command size here: " << command.size() << endl;
 	for (uint i = 0; i < command.size(); i++){
 		command[i].pop_back();
@@ -156,7 +158,11 @@ void client_request(vector<string> command){
 		fputs(command[i].c_str(), server_stream);
 		fputs(new_line.c_str(), server_stream);
 	}
+	cout << "before sleep" << endl;
+	sleep(3);
+	cout << "after sleep" << endl;
 	//cout << "after first" << endl;
+	fflush(server_stream);
     //char buffer[BUFSIZ];
    	//while (fgets(buffer, BUFSIZ, server_stream)) {
     //    fputs(buffer, stdout);
