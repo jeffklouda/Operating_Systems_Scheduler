@@ -95,6 +95,18 @@ int Scheduler::executeJob () {
     return -1;
 }
 
+void Scheduler::run() {
+    switch (policy) {
+        case fifo:  this->fifo_runner();
+                    break;
+        case rdrn:  this->rRobin_runner();
+                    break;
+        case mlfq:  this->mlfq_runner();
+                    break;
+        default:    break;
+    }
+}
+
 Policy Scheduler::get_policy(){
 	return policy;
 }
@@ -149,6 +161,20 @@ int Scheduler::get_average_response_time(){
 
 void Scheduler::set_average_response_time(int num){
 	average_response_time = num;
+}
+
+void Scheduler::fifo_runner() {
+    while (num_running_processes < nCPUS && this->jobsWaiting()) {
+        this->executeJob();
+    }
+}
+
+void Scheduler::rRobin_runner() {
+
+}
+
+void Scheduler::mlfq_runner() {
+
 }
 
 deque<Process> Scheduler::get_jobsWaitingTable(){

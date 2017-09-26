@@ -124,9 +124,7 @@ int main(int argc, char *argv[]) {
 	cout << "[" << time(NULL) << "] " << "INFO  Starting Process Queue Server..." << endl;
 	while (true){
 		signal(SIGCHLD, sigchld_handler);
-		if (scheduler_prime.get_policy() == fifo){
-			fifo_runner();
-		}
+		scheduler_prime.run();
 		struct pollfd pfd = {server_fd, POLLIN|POLLPRI, 0};
         int    result     = poll(&pfd, 1, POLL_TIMEOUT);
 		

@@ -42,35 +42,38 @@ class Scheduler {
         bool jobsWaiting();                         // return true if jobs waiting
         void pushJob (vector<string>);               
         vector<string>  popJob();
-	Process remove_process(int);
+	    Process remove_process(int);
         int  executeJob ();            // return pid/-1
         int  pauseProcess (Process);
         int  resumeProcess (Process);
         int  terminateProcess (Process);
         void run();                                 // run scheduler
-	Policy get_policy();  
-	int  get_nCPUS();    
-	int  get_total_processes();
-	void set_total_processes(int);
-	int  get_num_running_processes();
-	void set_num_running_processes(int);
-	int  get_num_waiting_processes();
-	void set_num_waiting_processes(int);
-	int  get_num_levels();
-	void set_num_levels(int);
-	int  get_average_turnaround_time();
-	void set_average_turnaround_time(int);
-	int  get_average_response_time();
-	void set_average_response_time(int);
-	deque<Process> get_jobsWaitingTable(); 
-	vector<Process> get_processTable();
+        Policy get_policy();  
+        int  get_nCPUS();    
+        int  get_total_processes();
+        void set_total_processes(int);
+        int  get_num_running_processes();
+        void set_num_running_processes(int);
+        int  get_num_waiting_processes();
+        void set_num_waiting_processes(int);
+        int  get_num_levels();
+        void set_num_levels(int);
+        int  get_average_turnaround_time();
+        void set_average_turnaround_time(int);
+        int  get_average_response_time();
+        void set_average_response_time(int);
+        void fifo_runner();
+        void rRobin_runner();
+        void mlfq_runner();
+        deque<Process> get_jobsWaitingTable(); 
+        vector<Process> get_processTable();
     private:
-	int total_processes;
-	int num_running_processes;
-	int num_waiting_processes;
-	int num_levels;
-	int average_response_time;
-	int average_turnaround_time;
+        int total_processes;
+        int num_running_processes;
+        int num_waiting_processes;
+        int num_levels;
+        int average_response_time;
+        int average_turnaround_time;
         int nCPUS;
         int timeSlice;
         Policy policy;
@@ -91,8 +94,5 @@ void running_log();
 void waiting_log();
 void flush_log();
 void reap_log(Process);
-
-// fifo.cpp
-void fifo_runner();
 
 #endif
