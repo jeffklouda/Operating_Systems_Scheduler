@@ -210,11 +210,12 @@ void Scheduler::rRobin_runner() {
    // move process from running queue to waiting queue
    if (!this->running.empty()) {
         Process p = this->running.front();
-        if (pauseProcess(p) < 0) 
-            fprintf(stdout, "pauseProcess failed\n");
-        this->running.pop_front();
-        this->waiting.push_back(p);
-        
+        if (time(NULL) - p.runtime >= timeSlice) {
+            if (pauseProcess(p) < 0) 
+                fprintf(stdout, "pauseProcess failed\n");
+            this->running.pop_front();
+            this->waiting.push_back(p);
+        }
    }
    // Move processes from waiting queue to running queue
    while (!this->waiting.empty() && this->running.size() < nCPUS) {

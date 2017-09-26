@@ -76,7 +76,7 @@ class Scheduler {
         int average_response_time;
         int average_turnaround_time;
         unsigned int nCPUS;
-        int timeSlice;
+        time_t timeSlice;
         Policy policy;
         deque<Process> waiting;
         deque<Process> running;
