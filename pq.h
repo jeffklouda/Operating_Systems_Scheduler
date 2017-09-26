@@ -89,9 +89,9 @@ void client_request(vector<string>);
 
 // logging.cpp
 void add_log(vector<string>, int);
-void status_log();
-void running_log();
-void waiting_log();
+void status_log(int);
+void running_log(int);
+void waiting_log(int);
 void flush_log();
 void reap_log(Process);
 
