@@ -10,19 +10,27 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <string.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sstream>
 
 using namespace std;
 extern Scheduler scheduler_prime;
 
-void print_waiting_processes(){
+string print_waiting_processes(){
+
 	deque<Process> current_waiting_table = scheduler_prime.get_jobsWaitingTable();
+
 	string command_to_print;
+	stringstream ss;	
+	
 	for (uint i = 0; i < current_waiting_table.size(); i++){
-		cout << setw(5) << right;
-		cout << current_waiting_table[i].pid;
-		cout << " ";
-		cout << setw(20) << left;
+		ss << setw(5) << right;
+		ss << current_waiting_table[i].pid;
+		ss << " ";
+		ss << setw(20) << left;
 		command_to_print = "";
 		for (uint j = 0; j < current_waiting_table[i].command.size(); j++){
 			if (j != 0){
@@ -30,38 +38,42 @@ void print_waiting_processes(){
 			}
 			command_to_print += current_waiting_table[i].command[j];			
 		}
-		cout << command_to_print;
-		cout << " ";
-		cout << setw(8);
-		cout << current_waiting_table[i].status;
-		cout << " ";
-		cout << setw(8);
-		cout << current_waiting_table[i].user;
-		cout << " ";
-		cout << setw(9);
-		cout << current_waiting_table[i].priority;
-		cout << " ";		
-		cout << setw(8);
+		ss << command_to_print;
+		ss << " ";
+		ss << setw(8);
+		ss << current_waiting_table[i].status;
+		ss << " ";
+		ss << setw(8);
+		ss << current_waiting_table[i].user;
+		ss << " ";
+		ss << setw(9);
+		ss << current_waiting_table[i].priority;
+		ss << " ";		
+		ss << setw(8);
 		//TODO: Calculate USAGE
-		cout << "0";
-		cout << " ";
-		cout << setw(9);
-		cout << current_waiting_table[i].schedtime;
-		cout << " ";
-		cout << setw(9);
-		cout << current_waiting_table[i].starttime;
-		cout << endl;
+		ss << "0";
+		ss << " ";
+		ss << setw(9);
+		ss << current_waiting_table[i].schedtime;
+		ss << " ";
+		ss << setw(9);
+		ss << current_waiting_table[i].starttime;
+		ss << endl;
 	}
+	string ss_string = ss.str();
+	return ss_string;
 }
 
-void print_running_processes(){
+string print_running_processes(){
 	vector<Process> current_process_table = scheduler_prime.get_processTable();
+
 	string command_to_print;
+	stringstream ss;
 	for (uint i = 0; i < current_process_table.size(); i++){
-		cout << setw(5) << right;
-		cout << current_process_table[i].pid;
-		cout << " ";
-		cout << setw(20) << left;
+		ss << setw(5) << right;
+		ss << current_process_table[i].pid;
+		ss << " ";
+		ss << setw(20) << left;
 		command_to_print = "";
 		for (uint j = 0; j < current_process_table[i].command.size(); j++){
 			if (j != 0){
@@ -69,28 +81,30 @@ void print_running_processes(){
 			}
 			command_to_print += current_process_table[i].command[j];			
 		}
-		cout << command_to_print;
-		cout << " ";
-		cout << setw(8);
-		cout << current_process_table[i].status;
-		cout << " ";
-		cout << setw(8);
-		cout << current_process_table[i].user;
-		cout << " ";
-		cout << setw(9);
-		cout << current_process_table[i].priority;
-		cout << " ";		
-		cout << setw(8);
+		ss << command_to_print;
+		ss << " ";
+		ss << setw(8);
+		ss << current_process_table[i].status;
+		ss << " ";
+		ss << setw(8);
+		ss << current_process_table[i].user;
+		ss << " ";
+		ss << setw(9);
+		ss << current_process_table[i].priority;
+		ss << " ";		
+		ss << setw(8);
 		//TODO: Calculate USAGE
-		cout << "0";
-		cout << " ";
-		cout << setw(9);
-		cout << current_process_table[i].schedtime;
-		cout << " ";
-		cout << setw(9);
-		cout << current_process_table[i].starttime;
-		cout << endl;
+		ss << "0";
+		ss << " ";
+		ss << setw(9);
+		ss << current_process_table[i].schedtime;
+		ss << " ";
+		ss << setw(9);
+		ss << current_process_table[i].starttime;
+		ss << endl;
 	}
+	string ss_string = ss.str();
+	return ss_string;
 }
 
 void add_log(vector<string> command_vector, int client_fd){
@@ -109,59 +123,88 @@ void add_log(vector<string> command_vector, int client_fd){
 	total_string += ": ";
 	total_string += command_string;
 	total_string += "\n";
-	cout << total_string <<endl;
-	//fflush(client_stream);	
-	//fputs(total_string.c_str(), client_stream);
-	//fflush(client_stream);
-	//cout << "HERE33" <<endl;
+		
+	cout << total_string;
+	//char buffer[BUFSIZ];
+    //strncpy(buffer, total_string.c_str(), BUFSIZ);
+    //if (send(client_fd, buffer, BUFSIZ, 0) < 0) {
+    //	perror("send");
+    //}
+
 }
 
-void status_log(){
-    cout << endl;	
-    cout << "Running =";
-	cout << setw(5);
-	cout << scheduler_prime.get_num_running_processes();
-	cout << ", Waiting =";
-	cout << setw(5);
-	cout << scheduler_prime.get_num_waiting_processes();
-	cout << ", Levels =";
-	cout << setw(5);
-	cout << scheduler_prime.get_num_levels();
-	cout << ", Turnaround =";
-	cout << setw(5);
-    cout << scheduler_prime.get_average_turnaround_time();
-	cout << ", Response =";
-	cout << setw(5);
-	cout << scheduler_prime.get_average_response_time();
-	cout << endl;	
+void status_log(int client_fd){
+	string ss_string = "";
+	stringstream ss;    
+	ss << endl;	
+    ss << "Running =";
+	ss << setw(5);
+	ss << scheduler_prime.get_num_running_processes();
+	ss << ", Waiting =";
+	ss << setw(5);
+	ss << scheduler_prime.get_num_waiting_processes();
+	ss << ", Levels =";
+	ss << setw(5);
+	ss << scheduler_prime.get_num_levels();
+	ss << ", Turnaround =";
+	ss << setw(5);
+    ss << scheduler_prime.get_average_turnaround_time();
+	ss << ", Response =";
+	ss << setw(5);
+	ss << scheduler_prime.get_average_response_time();
+	ss << endl;	
+	ss << endl;
+	ss << "Running Queue:" << endl;
+	ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " << endl;
+	ss_string += ss.str();
+
+	ss_string += print_running_processes();
 	cout << endl;
-	cout << "Running Queue:" << endl;
-	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " << endl;
-	//TODO: Write in loop to list Running Processes
-	print_running_processes();
-	cout << endl;
-	cout << "Waiting Queue:" << endl;
-	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+
+	stringstream ll;
+	ll << "Waiting Queue:" << endl;
+	ll << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
 << endl;
-	//TODO: Write in loop to list Waiting Processes	
-	print_waiting_processes();
+	ss_string += ll.str();
+	ss_string += print_waiting_processes();
+	char buffer[BUFSIZ];
+    strncpy(buffer, ss_string.c_str(), BUFSIZ);
+    if (send(client_fd, buffer, BUFSIZ, 0) < 0) {
+    	perror("send");
+    }
 
 }
 
-void running_log(){
-        cout << endl;
-	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+void running_log(int client_fd){
+	string ss_string = "";
+	stringstream ss;
+    ss << endl;
+	ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
 << endl;
-	//TODO: Write in loop to list Running Processes
-	print_running_processes();
+	ss_string += ss.str();
+	ss_string += print_running_processes();
+	char buffer[BUFSIZ];
+    strncpy(buffer, ss_string.c_str(), BUFSIZ);
+    if (send(client_fd, buffer, BUFSIZ, 0) < 0) {
+    	perror("send");
+    }
 }
 
-void waiting_log(){
-        cout << endl;
-	cout << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+void waiting_log(int client_fd){
+	string ss_string = "";
+	stringstream ss;
+    ss << endl;
+	ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
 << endl;
-	//TODO: Write in loop to list Waiting Processes
-	print_waiting_processes();
+	ss_string += ss.str();
+	ss_string += print_waiting_processes();
+
+	char buffer[BUFSIZ];
+    strncpy(buffer, ss_string.c_str(), BUFSIZ);
+    if (send(client_fd, buffer, BUFSIZ, 0) < 0) {
+    	perror("send");
+    }
+
 }
 
 void flush_log(){
