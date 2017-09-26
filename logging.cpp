@@ -270,7 +270,7 @@ void flush_log(){
 }
 
 
-void reap_log(Process reaped_process){
+void reap_log(Process reaped_process, int t_turnaround_time, int t_response_time){
         string process_string = "";
 		//cout << "reaped_process.command.size():" << reaped_process.command.size() << endl;
 		//cout << "reaped_process pid: " << reaped_process.pid << endl;
@@ -281,5 +281,6 @@ void reap_log(Process reaped_process){
         	process_string += reaped_process.command[i];
         }
 	//TODO: Calculate Turnaround Time and Response Time
-	cout << "[" << time(NULL) << "] INFO  Reaped Process " << reaped_process.pid << ": " << process_string << ", Turnaround= " << ", Reponse= " << endl;
+	cout << "turnaround_time: " << reaped_process.turnaround_time << endl;
+	cout << "[" << time(NULL) << "] INFO  Reaped Process " << reaped_process.pid << ": " << process_string << ", Turnaround= " << t_turnaround_time <<  ", Reponse= " << t_response_time << endl;
 }

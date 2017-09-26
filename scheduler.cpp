@@ -1,6 +1,11 @@
-/*
- *
+/* scheduler.cpp
+ * Implementation of functions in Scheduler class.
+ * Authors: Jeff Klouda and Matthew D'Alonzo
  */
+
+//Necessary Includes
+
+#include "pq.h"
 
 #include <time.h>
 #include <vector>
@@ -14,13 +19,14 @@
 #include <sys/time.h>
 #include <iostream>
 #include <algorithm>
-#include "pq.h"
+
 using namespace std;
 
 extern time_t prev_time;
 
+//Scheduler Constructor
 Scheduler::Scheduler() {
-	total_executed_processes = 0;
+    total_executed_processes = 0;
     policy = fifo;
     nCPUS = 1;
     timeSlice = 100;
@@ -30,45 +36,75 @@ Scheduler::Scheduler() {
     num_levels = 8;
     average_turnaround_time = 0;
     average_response_time = 0;
-	total_turnaround_time = 0;
-	total_response_time = 0;
+    total_turnaround_time = 0;
+    total_response_time = 0;
 }
 
+//Scheduler Deconstructor
 Scheduler::~Scheduler() {
-
 }
 
+//setSchedulerVals
+//Sets constants for Scheduler
 void Scheduler::setSchedulerVals(Policy p, int ncpus, int tmslice) {
     policy = p;
     nCPUS = ncpus;
     timeSlice = tmslice;
 }
 
+//jobsWaiting
+//Checks if Jobs are in waiting deque
 bool Scheduler::jobsWaiting() {
     return (!waiting.empty());
 }
 
+//pushJob
+//Pushes a job to the waiting deque
+//when the client first sends it.
 void Scheduler::pushJob (vector<string> job) {
-	
-	Process unrun_process = {job, 0, ready, 0, 0, 0, 0, 0, 0, time(NULL), time(NULL), 30};
+    Process unrun_process = {
+                             job,            //vector<string> command; 
+                             0,              //pid_t pid;
+                             ready,          //proc_status status;
+                             0,              //int priority;
+                             0,              //time_t utime;
+                             0,              //time_t stime;
+                             0,              //time_t cutime;
+                             0,              //time_t cstime
+                             0,              //time_t starttime;
+                             time(NULL),     //time_t runtime
+                             time(NULL),     //suseconds_t schedtime;
+                             30,             //int user;
+                             0,              //int allotment
+                             0,              //float response_time;
+                             0               //int turnaround_time;
+                           };
     waiting.push_front(unrun_process);
 }
 
+//popJob
+//Removes a job from the front of the waiting deque
 vector<string> Scheduler::popJob() {
     vector<string> job = waiting.front().command;
     waiting.pop_front();
-    return job;
+    
+   return job;
 }
 
+//remove_process
+//Removes a process from the process table
 Process Scheduler::remove_process(int index){
-	Process removed_process = this->running[index];
-	this->running.erase(this->running.begin()+index);
-	return removed_process;
+    Process removed_process = this->running[index];
+    this->running.erase(this->running.begin()+index);
+    
+   return removed_process;
 }
 
-//executeJob()
+//executeJob
 //This does the fork() and exec() on jobs
 //in the waiting queue.
+//NOTE: executeJob only occurs if the policy is set to rdrn or fifo.
+//NOTE: mlfq will use MLFQexecuteJob
 int Scheduler::executeJob () {
     
     vector<string> job = waiting.front().command;
@@ -82,6 +118,7 @@ int Scheduler::executeJob () {
 
     num_waiting_processes--;
     num_running_processes++;
+    
     pid_t pid = fork();
     
     switch (pid) {
@@ -89,35 +126,35 @@ int Scheduler::executeJob () {
             fprintf(stderr, "Unable to fork: %s\n", strerror(errno));
             return -1;
             break;
-
         case 0:             // Child
             execvp(command_char[0], command_char);
             return -1;      // fail
             break;
-
         default:            // Parent
-			total_response_time += (time(NULL) - this->waiting.front().schedtime);
-			total_executed_processes++;
+            total_response_time += (time(NULL) - this->waiting.front().schedtime);
+            total_executed_processes++;
 
-			average_response_time = float(total_response_time) / float(total_executed_processes);
+            average_response_time = float(total_response_time) / float(total_executed_processes);
 			
             this->waiting.front().pid = pid;
             this->waiting.front().starttime = time(NULL);
 
-			struct timeval start;
-			gettimeofday(&start, NULL);
+            struct timeval start;
+            gettimeofday(&start, NULL);
             waiting.front().runtime = start.tv_usec;
 
             this->running.push_back(waiting.front());
             this->waiting.pop_front();
             
-            //wait (NULL);
             break;
     }
 
     return -1;
 }
 
+//MLFQexecuteJob
+//This will execute a job
+//for the mlfq policy.
 int Scheduler::MLFQexecuteJob (Process &p) {
     
     vector<string> job = p.command;
@@ -138,65 +175,51 @@ int Scheduler::MLFQexecuteJob (Process &p) {
             fprintf(stderr, "Unable to fork: %s\n", strerror(errno));
             return -1;
             break;
-
         case 0:             // Child
             execvp(command_char[0], command_char);
             return -1;      // fail
             break;
-
         default:            // Parent
+            p.response_time = (time(NULL) - p.schedtime);
+            total_response_time += (time(NULL) - p.schedtime);
+            total_executed_processes++;
 
-			total_response_time += (time(NULL) - p.schedtime);
-			total_executed_processes++;
-
-			average_response_time = float(total_response_time) / float(total_executed_processes);
+            average_response_time = float(total_response_time) / float(total_executed_processes);
 
             p.pid = pid;
             p.starttime = time(NULL);
 
-			struct timeval start;
-			gettimeofday(&start, NULL);
+            struct timeval start;
+            gettimeofday(&start, NULL);
             p.runtime = start.tv_usec;
-
-           
-            
-            //wait (NULL);
             break;
     }
-
     return -1;
 }
 
+//pauseProcess
+//This sends the SIGSTOP signal to pause a process.
 int Scheduler::pauseProcess (Process &p) {
-   // for (auto it = this->running.begin(); it != this->running.end(); ++it) {
-    //    if (p.pid == it->pid) {
-			//cout << "attempt to pause pid: " << p.pid << "\n";
-            if (kill(p.pid, SIGSTOP) < 0) {
-                fprintf(stdout, "Stop signal failed: %s", strerror(errno));
-            }
-			//cout << "PAUSUSSUSUSUED\n";
-            return 0;
-      //  }
-   // }
-   // return -1;
+    if (kill(p.pid, SIGSTOP) < 0) {
+        fprintf(stdout, "Stop signal failed: %s", strerror(errno));
+    }
+    return 0;
 }
 
+//resumeProcess
+//This sends the SIGCONT signal to resume a process.
 int Scheduler::resumeProcess (Process &p) {
-    //for (auto it = this->waiting.begin(); it != this->waiting.end(); ++it) {
-     //   if (p.pid == it->pid) {
-			//cout << "resumeProcess pid: " << p.pid << endl;
-            if (kill(p.pid, SIGCONT) < 0) {
-                fprintf(stdout, "Cont signal failed: %s\n", strerror(errno));
-            }
-			struct timeval start;
-			gettimeofday(&start, NULL);
-            p.runtime = start.tv_usec;
-            return 0;
-//        }
- //   }
-  //  return -1;
+    if (kill(p.pid, SIGCONT) < 0) {
+        fprintf(stdout, "Cont signal failed: %s\n", strerror(errno));
+    }
+    struct timeval start;
+    gettimeofday(&start, NULL);
+    p.runtime = start.tv_usec;
+    return 0;
 }
 
+//terminateProcess
+//This sends the SIGKILL signall to end a process.
 int Scheduler::terminateProcess (Process &p) {
     if (kill(p.pid, SIGKILL) < 0) {
         fprintf(stdout, "Cont signal failed: %s\n", strerror(errno));
@@ -205,29 +228,32 @@ int Scheduler::terminateProcess (Process &p) {
     return 0;   
 }
 
+//run
+//This runs the scheduling policy.
 void Scheduler::run() {
-	for (uint i = 0; i < this->running.size(); i++){
-		string proc_pid = "/proc/";
-		proc_pid += to_string(this->running[i].pid);
-		proc_pid += "/stat";
-		//cout << "pid: " << this->running[i].pid;
-		//cout << "proc_pid string: " << proc_pid << endl;
-		FILE * proc_pid_stream = fopen(proc_pid.c_str(),	"r");
-		if (proc_pid_stream == NULL){
-			cout << "proc_pid_stream is null\n" << endl;
-		}
+    for (uint i = 0; i < this->running.size(); i++){
+        string proc_pid = "/proc/";
+        proc_pid += to_string(this->running[i].pid);
+        proc_pid += "/stat";
+        
+        FILE * proc_pid_stream = fopen(proc_pid.c_str(), "r");
 
-		long unsigned int user_time=0;
-		long unsigned int s_time=0;
-		long int cu_time=0;
-		long int cs_time=0;
-		fscanf(proc_pid_stream, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu %ld %ld", &user_time, &s_time, &cu_time, &cs_time);
+        if (proc_pid_stream == NULL){
+            cout << "proc_pid_stream is null\n" << endl;
+        }
+
+        //long unsigned int user_time=0;
+        //long unsigned int s_time=0;
+        //long int cu_time=0;
+        //long int cs_time=0;
+		
+        fscanf(proc_pid_stream, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu %ld %ld", &running[i].utime, &running[i].stime, &running[i].cutime, &running[i].cstime);
 
 
-		running[i].utime  = user_time;
-		running[i].stime  = s_time;
-		running[i].cutime = cu_time;
-		running[i].cstime = cs_time;
+        //running[i].utime  = user_time;
+        //running[i].stime  = s_time;
+        //running[i].cutime = cu_time;
+        //running[i].cstime = cs_time;
 	}
 
     switch (policy) {
