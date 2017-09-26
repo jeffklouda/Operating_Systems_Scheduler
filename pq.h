@@ -65,19 +65,21 @@ class Scheduler {
         void fifo_runner();
         void rRobin_runner();
         void mlfq_runner();
-        deque<Process> get_jobsWaitingTable(); 
+        deque<Process> get_waiting();
+        deque<Process> get_running();
         vector<Process> get_processTable();
     private:
-        int total_processes;
-        int num_running_processes;
-        int num_waiting_processes;
+        unsigned int total_processes;
+        unsigned int num_running_processes;
+        unsigned int num_waiting_processes;
         int num_levels;
         int average_response_time;
         int average_turnaround_time;
-        int nCPUS;
+        unsigned int nCPUS;
         int timeSlice;
         Policy policy;
-        deque<Process> jobsWaitingTable;
+        deque<Process> waiting;
+        deque<Process> running;
         vector<Process> processTable;
 };
 

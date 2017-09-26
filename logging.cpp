@@ -21,7 +21,7 @@ extern Scheduler scheduler_prime;
 
 string print_waiting_processes(){
 
-	deque<Process> current_waiting_table = scheduler_prime.get_jobsWaitingTable();
+	deque<Process> current_waiting_table = scheduler_prime.get_waiting();
 
 	string command_to_print;
 	stringstream ss;	

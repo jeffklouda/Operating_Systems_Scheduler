@@ -36,17 +36,17 @@ void Scheduler::setSchedulerVals(Policy p, int ncpus, int tmslice) {
 }
 
 bool Scheduler::jobsWaiting() {
-    return (!jobsWaitingTable.empty());
+    return (!waiting.empty());
 }
 
 void Scheduler::pushJob (vector<string> job) {
 	Process unrun_process = {job, 0, ready, -1, 0, 0, 0, 0, 0, time(NULL), 0};
-    jobsWaitingTable.push_front(unrun_process);
+    waiting.push_front(unrun_process);
 }
 
 vector<string> Scheduler::popJob() {
-    vector<string> job = jobsWaitingTable.front().command;
-    jobsWaitingTable.pop_front();
+    vector<string> job = waiting.front().command;
+    waiting.pop_front();
     return job;
 }
 
@@ -61,9 +61,9 @@ Process Scheduler::remove_process(int index){
 //in the waiting queue.
 int Scheduler::executeJob () {
     
-    vector<string> job = jobsWaitingTable.front().command;
-    processTable.push_back(jobsWaitingTable.front());
-    jobsWaitingTable.pop_front();
+    vector<string> job = waiting.front().command;
+    processTable.push_back(waiting.front());
+    waiting.pop_front();
 
     vector<char*> exec_command;
     for (uint i = 0; i < job.size(); i++){
@@ -88,11 +88,44 @@ int Scheduler::executeJob () {
             break;
 
         default:            // Parent
+            waiting.front().pid = pid;
+            processTable.push_back(waiting.front());
+            this->running.push_back(waiting.front());
+            waiting.pop_front();
+            
             //wait (NULL);
             break;
     }
 
     return -1;
+}
+
+int Scheduler::pauseProcess (Process p) {
+    for (auto it = this->running.begin(); it != this->running.end(); ++it) {
+        if (p.pid == it->pid) {
+            if (kill(p.pid, SIGSTOP) < 0) {
+                fprintf(stdout, "Stop signal failed: %s", strerror(errno));
+            }
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int Scheduler::resumeProcess (Process p) {
+    for (auto it = this->waiting.begin(); it != this->waiting.end(); ++it) {
+        if (p.pid == it->pid) {
+            if (kill(p.pid, SIGCONT) < 0) {
+                fprintf(stdout, "Cont signal failed: %s\n", strerror(errno));
+            }
+            return 0;
+        }
+    }
+    return -1;
+}
+
+int Scheduler::terminateProcess (Process p) {
+    return 0;   
 }
 
 void Scheduler::run() {
@@ -170,6 +203,26 @@ void Scheduler::fifo_runner() {
 }
 
 void Scheduler::rRobin_runner() {
+   // move process from running queue to waiting queue
+   if (!this->running.empty()) {
+        Process p = this->running.front();
+        if (pauseProcess(p) < 0) 
+            fprintf(stdout, "pauseProcess failed\n");
+        this->running.pop_front();
+        this->waiting.push_back(p);
+        
+   }
+   // Move processes from waiting queue to running queue
+   while (!this->waiting.empty() && this->running.size() < nCPUS) {
+        Process p = this->waiting.front();
+        if (p.pid == 0) 
+            this->executeJob();
+        else {
+            resumeProcess(p);
+            this->running.push_back(p);
+            this->waiting.pop_front();
+        }
+   }
 
 }
 
@@ -177,8 +230,8 @@ void Scheduler::mlfq_runner() {
 
 }
 
-deque<Process> Scheduler::get_jobsWaitingTable(){
-	return jobsWaitingTable;
+deque<Process> Scheduler::get_waiting(){
+	return waiting;
 }
 
 vector<Process> Scheduler::get_processTable(){
