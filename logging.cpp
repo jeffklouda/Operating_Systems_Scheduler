@@ -93,7 +93,7 @@ void print_running_processes(){
 	}
 }
 
-void add_log(vector<string> command_vector, FILE* client_stream){
+void add_log(vector<string> command_vector, int client_fd){
 	string command_string = "";
 	for (uint i = 0; i < command_vector.size(); i++){
 		if (i != 0){

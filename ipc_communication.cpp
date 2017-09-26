@@ -128,9 +128,9 @@ void server_accept(int server_fd){
 		command.erase(command.begin());
 		scheduler_prime.pushJob(command);
 
-        /*
-		add_log(command, client_stream);
-		*/
+        
+	add_log(command, client_fd);
+	
 
         for (uint i = 0; i < command.size(); i++){
             command[i] = command[i] + "\n";

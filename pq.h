@@ -85,7 +85,7 @@ void server_accept(int);
 void client_request(vector<string>);
 
 // logging.cpp
-void add_log(vector<string>, FILE *);
+void add_log(vector<string>, int);
 void status_log();
 void running_log();
 void waiting_log();
