@@ -68,7 +68,6 @@ class Scheduler {
         void mlfq_runner();
         deque<Process> get_waiting();
         deque<Process> get_running();
-        vector<Process> get_processTable();
     private:
         unsigned int total_processes;
         unsigned int num_running_processes;
@@ -81,7 +80,7 @@ class Scheduler {
         Policy policy;
         deque<Process> waiting;
         deque<Process> running;
-        vector<Process> processTable;
+        //vector<Process> processTable;
 };
 
 //  ipc_communication.cpp

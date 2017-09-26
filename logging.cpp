@@ -65,7 +65,7 @@ string print_waiting_processes(){
 }
 
 string print_running_processes(){
-	vector<Process> current_process_table = scheduler_prime.get_processTable();
+	deque<Process> current_process_table = scheduler_prime.get_running();
 
 	string command_to_print;
 	stringstream ss;
@@ -215,6 +215,8 @@ void flush_log(){
 
 void reap_log(Process reaped_process){
         string process_string = "";
+		cout << "reaped_process.command.size():" << reaped_process.command.size() << endl;
+		cout << "reaped_process pid: " << reaped_process.pid << endl;
         for (uint i = 0; i < reaped_process.command.size(); i++){
 		if (i != 0){
 			process_string += " ";

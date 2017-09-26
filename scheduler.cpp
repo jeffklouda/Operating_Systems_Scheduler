@@ -51,8 +51,8 @@ vector<string> Scheduler::popJob() {
 }
 
 Process Scheduler::remove_process(int index){
-	Process removed_process = processTable[index];
-	processTable.erase(processTable.begin()+index);
+	Process removed_process = this->running[index];
+	this->running.erase(this->running.begin()+index);
 	return removed_process;
 }
 
@@ -62,8 +62,6 @@ Process Scheduler::remove_process(int index){
 int Scheduler::executeJob () {
     
     vector<string> job = waiting.front().command;
-    processTable.push_back(waiting.front());
-    waiting.pop_front();
 
     vector<char*> exec_command;
     for (uint i = 0; i < job.size(); i++){
@@ -91,7 +89,6 @@ int Scheduler::executeJob () {
             waiting.front().pid = pid;
             waiting.front().starttime = time(NULL);
             waiting.front().runtime = time(NULL);
-            processTable.push_back(waiting.front());
             this->running.push_back(waiting.front());
             waiting.pop_front();
             
@@ -241,7 +238,7 @@ deque<Process> Scheduler::get_waiting(){
 	return waiting;
 }
 
-vector<Process> Scheduler::get_processTable(){
-	return processTable;
+deque<Process> Scheduler::get_running(){
+	return this->running;
 }
 

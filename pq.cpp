@@ -49,10 +49,12 @@ void sigchld_handler(int signum){
     pid_t p;
     int status;
     while ((p=waitpid(-1, &status, WNOHANG)) != -1){
-        for (uint i = 0; i < scheduler_prime.get_processTable().size(); i++){
-            if (scheduler_prime.get_processTable()[i].pid == p){
-                 reap_log(scheduler_prime.get_processTable()[i]);
-		 scheduler_prime.remove_process(i);
+        for (uint i = 0; i < scheduler_prime.get_running().size(); i++){
+            if (scheduler_prime.get_running()[i].pid == p){
+				 cout << "Process pid: " << scheduler_prime.get_running()[i].pid << endl;
+                 reap_log(scheduler_prime.get_running()[i]);
+		 		 scheduler_prime.remove_process(i);
+
             }
         }
     }
