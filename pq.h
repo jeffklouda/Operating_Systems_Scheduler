@@ -8,6 +8,7 @@
 #include <queue>
 #include <deque>
 #include <stdio.h>
+#include <sys/time.h>
 
 #ifndef PQ_H
 #define PQ_H
@@ -29,8 +30,9 @@ struct Process {
     time_t cstime;          //  Waited-for children's kernel mode CPU time
     time_t starttime;       //  Time when process started in clock ticks
     time_t runtime;         //  Time when process was last continued
-    time_t schedtime;       //  Time when process was first scheduled
+    suseconds_t schedtime;       //  Time when process was first scheduled
 	int user;
+	int allotment;
 };
 
 class Scheduler {
@@ -60,25 +62,34 @@ class Scheduler {
         int  get_num_levels();
         void set_num_levels(int);
         int  get_average_turnaround_time();
-        void set_average_turnaround_time(int);
+        void set_average_turnaround_time();
         int  get_average_response_time();
         void set_average_response_time(int);
         void fifo_runner();
         void rRobin_runner();
         void mlfq_runner();
         deque<Process> get_waiting();
+		deque<Process> get_level(int);
         deque<Process> get_running();
+		int MLFQexecuteJob(Process&);
+		void increment_dead_processes();
+		void add_to_total_turnaround_time(unsigned int);
     private:
         unsigned int total_processes;
+		unsigned int total_executed_processes;
+		unsigned int total_dead_processes;
         unsigned int num_running_processes;
         unsigned int num_waiting_processes;
+		unsigned int total_turnaround_time;
+		unsigned int total_response_time;
         int num_levels;
-        int average_response_time;
-        int average_turnaround_time;
+        float average_response_time;
+        float average_turnaround_time;
         unsigned int nCPUS;
         time_t timeSlice;
         Policy policy;
         deque<Process> waiting;
+		deque<Process> levels[8];
         deque<Process> running;
         //vector<Process> processTable;
 };

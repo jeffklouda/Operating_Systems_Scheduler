@@ -44,7 +44,7 @@ string print_waiting_processes(){
 		ss << current_waiting_table[i].status;
 		ss << " ";
 		ss << setw(8);
-		ss << current_waiting_table[i].user;
+		ss << current_waiting_table[i].utime;
 		ss << " ";
 		ss << setw(9);
 		ss << current_waiting_table[i].priority;
@@ -61,6 +61,55 @@ string print_waiting_processes(){
 		ss << endl;
 	}
 	string ss_string = ss.str();
+	return ss_string;
+}
+
+string print_waiting_processes_mlfq(){
+	string ss_string = "";
+
+	for (uint l = 0; l < 8; l++){
+
+		deque<Process> current_waiting_table = scheduler_prime.get_level(l);
+
+		string command_to_print;
+		stringstream ss;	
+	
+		for (uint i = 0; i < current_waiting_table.size(); i++){
+			ss << setw(5) << right;
+			ss << current_waiting_table[i].pid;
+			ss << " ";
+			ss << setw(20) << left;
+			command_to_print = "";
+			for (uint j = 0; j < current_waiting_table[i].command.size(); j++){
+				if (j != 0){
+					command_to_print += " ";
+				}
+				command_to_print += current_waiting_table[i].command[j];			
+			}
+			ss << command_to_print;
+			ss << " ";
+			ss << setw(8);
+			ss << current_waiting_table[i].status;
+			ss << " ";
+			ss << setw(8);
+			ss << current_waiting_table[i].utime;	
+			ss << " ";
+			ss << setw(9);
+			ss << current_waiting_table[i].priority;
+			ss << " ";		
+			ss << setw(8);
+			//TODO: Calculate USAGE
+			ss << "0";
+			ss << " ";
+			ss << setw(9);
+			ss << current_waiting_table[i].schedtime;
+			ss << " ";
+			ss << setw(9);
+			ss << current_waiting_table[i].starttime;
+			ss << endl;
+		}
+		ss_string += ss.str();
+	}		
 	return ss_string;
 }
 
@@ -87,7 +136,7 @@ string print_running_processes(){
 		ss << current_process_table[i].status;
 		ss << " ";
 		ss << setw(8);
-		ss << current_process_table[i].user;
+		ss << current_process_table[i].utime;
 		ss << " ";
 		ss << setw(9);
 		ss << current_process_table[i].priority;
@@ -166,7 +215,11 @@ void status_log(int client_fd){
 	ll << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
 << endl;
 	ss_string += ll.str();
-	ss_string += print_waiting_processes();
+	if (scheduler_prime.get_policy() == mlfq){
+		ss_string += print_waiting_processes_mlfq();
+	}else{
+		ss_string += print_waiting_processes();
+	}
 	char buffer[BUFSIZ];
     strncpy(buffer, ss_string.c_str(), BUFSIZ);
     if (send(client_fd, buffer, BUFSIZ, 0) < 0) {
@@ -197,7 +250,11 @@ void waiting_log(int client_fd){
 	ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
 << endl;
 	ss_string += ss.str();
-	ss_string += print_waiting_processes();
+	if (scheduler_prime.get_policy() == mlfq){
+		ss_string += print_waiting_processes_mlfq();
+	}else{
+		ss_string += print_waiting_processes();
+	}
 
 	char buffer[BUFSIZ];
     strncpy(buffer, ss_string.c_str(), BUFSIZ);
@@ -215,8 +272,8 @@ void flush_log(){
 
 void reap_log(Process reaped_process){
         string process_string = "";
-		cout << "reaped_process.command.size():" << reaped_process.command.size() << endl;
-		cout << "reaped_process pid: " << reaped_process.pid << endl;
+		//cout << "reaped_process.command.size():" << reaped_process.command.size() << endl;
+		//cout << "reaped_process pid: " << reaped_process.pid << endl;
         for (uint i = 0; i < reaped_process.command.size(); i++){
 		if (i != 0){
 			process_string += " ";

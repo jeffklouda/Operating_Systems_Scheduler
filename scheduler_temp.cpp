@@ -20,7 +20,6 @@ using namespace std;
 extern time_t prev_time;
 
 Scheduler::Scheduler() {
-	total_executed_processes = 0;
     policy = fifo;
     nCPUS = 1;
     timeSlice = 100;
@@ -30,8 +29,6 @@ Scheduler::Scheduler() {
     num_levels = 8;
     average_turnaround_time = 0;
     average_response_time = 0;
-	total_turnaround_time = 0;
-	total_response_time = 0;
 }
 
 Scheduler::~Scheduler() {
@@ -49,8 +46,7 @@ bool Scheduler::jobsWaiting() {
 }
 
 void Scheduler::pushJob (vector<string> job) {
-	
-	Process unrun_process = {job, 0, ready, 0, 0, 0, 0, 0, 0, time(NULL), time(NULL), 30};
+	Process unrun_process = {job, 0, ready, 0, 0, 0, 0, 0, 0, time(NULL), 0, 30};
     waiting.push_front(unrun_process);
 }
 
@@ -96,11 +92,6 @@ int Scheduler::executeJob () {
             break;
 
         default:            // Parent
-			total_response_time += (time(NULL) - this->waiting.front().schedtime);
-			total_executed_processes++;
-
-			average_response_time = float(total_response_time) / float(total_executed_processes);
-			
             this->waiting.front().pid = pid;
             this->waiting.front().starttime = time(NULL);
 
@@ -145,12 +136,6 @@ int Scheduler::MLFQexecuteJob (Process &p) {
             break;
 
         default:            // Parent
-
-			total_response_time += (time(NULL) - p.schedtime);
-			total_executed_processes++;
-
-			average_response_time = float(total_response_time) / float(total_executed_processes);
-
             p.pid = pid;
             p.starttime = time(NULL);
 
@@ -288,7 +273,6 @@ void Scheduler::rRobin_runner() {
 
 void Scheduler::mlfq_runner() {
 	Process p;	
-	//cout << "before running empty check\n";
 	if (!this->running.empty()){
 		p = this->running.front();
 		this->running.pop_front();
@@ -299,9 +283,8 @@ void Scheduler::mlfq_runner() {
 		pauseProcess(p);
 		this->levels[p.priority].push_back(p);
 	}
-	//cout << "before priority boost\n";
 	if (time(NULL) != prev_time && time(NULL) % 5 == 0){
-		//cout << "PRIORITYBOOST!!!!\n";
+		cout << "PRIORITYBOOST!!!!\n";
 		prev_time = time(NULL);
 		for (uint i = 0; i < 8; i++){
 			while (!levels[i].empty()){
@@ -384,8 +367,8 @@ int Scheduler::get_average_turnaround_time(){
 	return average_turnaround_time;
 }
 
-void Scheduler::set_average_turnaround_time(){
-	average_turnaround_time = float(total_turnaround_time) / float(total_dead_processes);
+void Scheduler::set_average_turnaround_time(int num){
+	average_turnaround_time = num;
 }
 
 int Scheduler::get_average_response_time(){
@@ -398,12 +381,4 @@ void Scheduler::set_average_response_time(int num){
 
 deque<Process> Scheduler::get_level(int index){
 	return levels[index];
-}
-
-void Scheduler::increment_dead_processes(){
-	total_dead_processes++;
-}
-
-void Scheduler::add_to_total_turnaround_time(unsigned int num){
-	total_turnaround_time += num;
 }
