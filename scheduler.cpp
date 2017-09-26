@@ -89,6 +89,8 @@ int Scheduler::executeJob () {
 
         default:            // Parent
             waiting.front().pid = pid;
+            waiting.front().starttime = time(NULL);
+            waiting.front().runtime = time(NULL);
             processTable.push_back(waiting.front());
             this->running.push_back(waiting.front());
             waiting.pop_front();
@@ -100,7 +102,7 @@ int Scheduler::executeJob () {
     return -1;
 }
 
-int Scheduler::pauseProcess (Process p) {
+int Scheduler::pauseProcess (Process &p) {
     for (auto it = this->running.begin(); it != this->running.end(); ++it) {
         if (p.pid == it->pid) {
             if (kill(p.pid, SIGSTOP) < 0) {
@@ -112,19 +114,24 @@ int Scheduler::pauseProcess (Process p) {
     return -1;
 }
 
-int Scheduler::resumeProcess (Process p) {
+int Scheduler::resumeProcess (Process &p) {
     for (auto it = this->waiting.begin(); it != this->waiting.end(); ++it) {
         if (p.pid == it->pid) {
             if (kill(p.pid, SIGCONT) < 0) {
                 fprintf(stdout, "Cont signal failed: %s\n", strerror(errno));
             }
+            p.runtime = time(NULL);
             return 0;
         }
     }
     return -1;
 }
 
-int Scheduler::terminateProcess (Process p) {
+int Scheduler::terminateProcess (Process &p) {
+    if (kill(p.pid, SIGKILL) < 0) {
+        fprintf(stdout, "Cont signal failed: %s\n", strerror(errno));
+        return -1;
+    }
     return 0;   
 }
 
