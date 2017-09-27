@@ -242,18 +242,8 @@ void Scheduler::run() {
             cout << "proc_pid_stream is null\n" << endl;
         }
 
-        //long unsigned int user_time=0;
-        //long unsigned int s_time=0;
-        //long int cu_time=0;
-        //long int cs_time=0;
 		
         fscanf(proc_pid_stream, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu %ld %ld", &running[i].utime, &running[i].stime, &running[i].cutime, &running[i].cstime);
-
-
-        //running[i].utime  = user_time;
-        //running[i].stime  = s_time;
-        //running[i].cutime = cu_time;
-        //running[i].cstime = cs_time;
 	}
 
     switch (policy) {
