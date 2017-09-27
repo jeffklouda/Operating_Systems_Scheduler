@@ -23,6 +23,7 @@
 using namespace std;
 
 //  Global Variables
+int          run_flag        = 1;
 time_t       prev_time       = 0;                //Used for Priority Boost (MLFQ)
 int          NCPUS           = 1;                //Number of CPUs (for running mutiple processes at once
 Policy       POLICY          = fifo;             //Scheduling Policy (fifo, rdrn, mlfq)
@@ -78,6 +79,11 @@ void sigchld_handler(int signum){
     }
 }
 
+void sigint_handler(int signum){
+    scheduler_prime.flush_jobs();
+    run_flag = 0;
+}
+
 //Main Function
 //Contains command-line parsing, client request running,
 //and the main server loop.
@@ -115,12 +121,12 @@ int main(int argc, char *argv[]) {
             SCHEDTIME = atoi(argv[argIndex++]);
         } else if (flag == "add") {
             //  Run client
-	    command_request.push_back(flag);
+	        command_request.push_back(flag);
             while (argIndex < (argc)){
-	        flag = argv[argIndex++];
+	            flag = argv[argIndex++];
                 command_request.push_back(flag);
-	    }
-	    client_request(command_request);
+	        }
+	        client_request(command_request);
             return EXIT_SUCCESS;
         } else if ( flag == "status" || flag == "running" ||
                     flag == "waiting" || flag == "flush" ) {
@@ -144,7 +150,9 @@ int main(int argc, char *argv[]) {
     //This is where the server will do everything,
     //including receiving client information and 
     //running commands. 
-    while (true){
+    while (run_flag == 1){
+
+		signal(SIGINT, sigint_handler);
 
         //sigaction handler
         //This runs the signal handler

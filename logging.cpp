@@ -41,6 +41,36 @@ string print_waiting_processes(){
 		ss << command_to_print;
 		ss << " ";
 		ss << setw(8);
+    
+        switch (current_waiting_table[i].status_char){
+            case ('A'): ss << "Waiting";
+                        break;
+            case ('R'): ss << "Running";
+                        break;
+            case ('S'): ss << "Sleeping";
+                        break;
+            case ('D'): ss << "Waiting";
+                        break;
+            case ('Z'): ss << "Zombie";
+                        break;
+            case ('T'): ss << "Stopped";
+                        break;
+            case ('t'): ss << "Tracing";
+                        break;
+            case ('X'): ss << "Dead";
+                        break;
+            case ('x'): ss << "Dead";
+                        break;
+            case ('K'): ss << "Wakekill";
+                        break;
+            case ('W'): ss << "Waking";
+                        break;
+            case ('P'): ss << "Parked";
+                        break;
+            default:    ss << "Unknown";
+                        break;
+        }
+
 		ss << current_waiting_table[i].status;
 		ss << " ";
 		ss << setw(8);
@@ -50,8 +80,7 @@ string print_waiting_processes(){
 		ss << current_waiting_table[i].priority;
 		ss << " ";		
 		ss << setw(8);
-		//TODO: Calculate USAGE
-		ss << "0";
+        ss << "0";
 		ss << " ";
 		ss << setw(9);
 		ss << current_waiting_table[i].schedtime;
@@ -73,7 +102,11 @@ string print_waiting_processes_mlfq(){
 
 		string command_to_print;
 		stringstream ss;	
-	
+
+        ss << "Level " << to_string(l) << endl;
+        ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+<< endl;	
+
 		for (uint i = 0; i < current_waiting_table.size(); i++){
 			ss << setw(5) << right;
 			ss << current_waiting_table[i].pid;
@@ -89,7 +122,39 @@ string print_waiting_processes_mlfq(){
 			ss << command_to_print;
 			ss << " ";
 			ss << setw(8);
-			ss << current_waiting_table[i].status;
+
+        switch (current_waiting_table[i].status_char){
+            case ('A'): ss << "Waiting";
+                        break;
+            case ('R'): ss << "Running";
+                        break;
+            case ('S'): ss << "Sleeping";
+                        break;
+            case ('D'): ss << "Waiting";
+                        break;
+            case ('Z'): ss << "Zombie";
+                        break;
+            case ('T'): ss << "Stopped";
+                        break;
+            case ('t'): ss << "Tracing";
+                        break;
+            case ('X'): ss << "Dead";
+                        break;
+            case ('x'): ss << "Dead";
+                        break;
+            case ('K'): ss << "Wakekill";
+                        break;
+            case ('W'): ss << "Waking";
+                        break;
+            case ('P'): ss << "Parked";
+                        break;
+            default:    ss << "Unknown";
+                        break;
+
+
+        }
+
+
 			ss << " ";
 			ss << setw(8);
 			ss << current_waiting_table[i].utime;	
@@ -98,8 +163,8 @@ string print_waiting_processes_mlfq(){
 			ss << current_waiting_table[i].priority;
 			ss << " ";		
 			ss << setw(8);
-			//TODO: Calculate USAGE
-			ss << "0";
+            ss << "0";
+
 			ss << " ";
 			ss << setw(9);
 			ss << current_waiting_table[i].schedtime;
@@ -133,7 +198,39 @@ string print_running_processes(){
 		ss << command_to_print;
 		ss << " ";
 		ss << setw(8);
-		ss << current_process_table[i].status;
+
+        switch (current_process_table[i].status_char){
+            case ('A'): ss << "Waiting";
+                        break;
+            case ('R'): ss << "Running";
+                        break;
+            case ('S'): ss << "Sleeping";
+                        break;
+            case ('D'): ss << "Waiting";
+                        break;
+            case ('Z'): ss << "Zombie";
+                        break;
+            case ('T'): ss << "Stopped";
+                        break;
+            case ('t'): ss << "Tracing";
+                        break;
+            case ('X'): ss << "Dead";
+                        break;
+            case ('x'): ss << "Dead";
+                        break;
+            case ('K'): ss << "Wakekill";
+                        break;
+            case ('W'): ss << "Waking";
+                        break;
+            case ('P'): ss << "Parked";
+                        break;
+            default:    ss << "Unknown";
+                        break;
+
+
+        }
+
+
 		ss << " ";
 		ss << setw(8);
 		ss << current_process_table[i].utime;
@@ -143,7 +240,9 @@ string print_running_processes(){
 		ss << " ";		
 		ss << setw(8);
 		//TODO: Calculate USAGE
-		ss << "0";
+        float usage = current_process_table[i].utime / (time(NULL) - current_process_table[i].starttime);
+        ss << to_string(usage);
+
 		ss << " ";
 		ss << setw(9);
 		ss << current_process_table[i].schedtime;
@@ -208,7 +307,7 @@ void status_log(int client_fd){
 	ss_string += ss.str();
 
 	ss_string += print_running_processes();
-	cout << endl;
+	//cout << endl;
 
 	stringstream ll;
 	ll << "Waiting Queue:" << endl;
@@ -247,8 +346,10 @@ void waiting_log(int client_fd){
 	string ss_string = "";
 	stringstream ss;
     ss << endl;
-	ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
+	if (scheduler_prime.get_policy() != mlfq){
+	    ss << "  PID COMMAND              STATE    USER     THRESHOLD USAGE    ARRIVAL    START     " 
 << endl;
+    }
 	ss_string += ss.str();
 	if (scheduler_prime.get_policy() == mlfq){
 		ss_string += print_waiting_processes_mlfq();
@@ -269,18 +370,29 @@ void flush_log(){
 	cout << "Flushed " << scheduler_prime.get_num_running_processes() << " running and " << scheduler_prime.get_num_waiting_processes() << " waiting processes" << endl;
 }
 
-
+//reap_log
+//Sends log when process is ended
 void reap_log(Process reaped_process, int t_turnaround_time, int t_response_time){
-        string process_string = "";
-		//cout << "reaped_process.command.size():" << reaped_process.command.size() << endl;
-		//cout << "reaped_process pid: " << reaped_process.pid << endl;
-        for (uint i = 0; i < reaped_process.command.size(); i++){
-		if (i != 0){
-			process_string += " ";
-		}
-        	process_string += reaped_process.command[i];
+    string process_string = "";
+    for (uint i = 0; i < reaped_process.command.size(); i++){
+        if (i != 0){
+            process_string += " ";
         }
-	//TODO: Calculate Turnaround Time and Response Time
-	cout << "turnaround_time: " << reaped_process.turnaround_time << endl;
+        process_string += reaped_process.command[i];
+    }
 	cout << "[" << time(NULL) << "] INFO  Reaped Process " << reaped_process.pid << ": " << process_string << ", Turnaround= " << t_turnaround_time <<  ", Reponse= " << t_response_time << endl;
+}
+
+
+//start_process_log
+//Sends log when process is first executed
+void start_process_log(Process started_process){
+    string process_string = "";
+    for (uint i = 0; i < started_process.command.size(); i++){
+        if (i != 0){
+            process_string += " ";
+        }
+        process_string += started_process.command[i];
+    }
+	cout << "[" << time(NULL) << "] INFO  Started Process " << started_process.pid << ": " << process_string << endl;
 }

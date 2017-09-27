@@ -106,6 +106,7 @@ void server_accept(int server_fd){
 		waiting_log(client_fd);
 	}else if (command[0] == "flush"){
 		flush_log();
+        scheduler_prime.flush_jobs();
 	}
 
 	close(client_fd);

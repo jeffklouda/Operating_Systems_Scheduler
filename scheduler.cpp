@@ -50,6 +50,14 @@ void Scheduler::setSchedulerVals(Policy p, int ncpus, int tmslice) {
     policy = p;
     nCPUS = ncpus;
     timeSlice = tmslice;
+    switch (policy){
+        case fifo: num_levels = 1;
+                   break;
+        case rdrn: num_levels = 1;
+                   break;
+        case mlfq: num_levels = 8;
+                   break;
+    }
 }
 
 //jobsWaiting
@@ -77,7 +85,8 @@ void Scheduler::pushJob (vector<string> job) {
                              30,             //int user;
                              0,              //int allotment
                              0,              //float response_time;
-                             0               //int turnaround_time;
+                             0,              //int turnaround_time;
+                             'A'             //char status_char;
                            };
     waiting.push_front(unrun_process);
 }
@@ -134,6 +143,7 @@ int Scheduler::executeJob () {
             total_response_time += (time(NULL) - this->waiting.front().schedtime);
             total_executed_processes++;
 
+
             average_response_time = float(total_response_time) / float(total_executed_processes);
 			
             this->waiting.front().pid = pid;
@@ -142,6 +152,8 @@ int Scheduler::executeJob () {
             struct timeval start;
             gettimeofday(&start, NULL);
             waiting.front().runtime = start.tv_usec;
+
+            start_process_log(this->waiting.front());
 
             this->running.push_back(waiting.front());
             this->waiting.pop_front();
@@ -192,6 +204,9 @@ int Scheduler::MLFQexecuteJob (Process &p) {
             struct timeval start;
             gettimeofday(&start, NULL);
             p.runtime = start.tv_usec;
+
+            start_process_log(this->waiting.front());
+
             break;
     }
     return -1;
@@ -243,7 +258,7 @@ void Scheduler::run() {
         }
 
 		
-        fscanf(proc_pid_stream, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu %ld %ld", &running[i].utime, &running[i].stime, &running[i].cutime, &running[i].cstime);
+        fscanf(proc_pid_stream, "%*d %*s %c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu %ld %ld", &running[i].status_char, &running[i].utime, &running[i].stime, &running[i].cutime, &running[i].cstime);
 	}
 
     switch (policy) {
@@ -257,169 +272,186 @@ void Scheduler::run() {
     }
 }
 
-
+//fifo_runner
+//runs the fifo policy scheduler
 void Scheduler::fifo_runner() {
     while (num_running_processes < nCPUS && this->jobsWaiting()) {
         this->executeJob();
     }
 }
 
+//rRobin_runner
+//runs the round robin policy scheduler
 void Scheduler::rRobin_runner() {
-   // move process from running queue to waiting queue
-   //cout << "beginning of robin runner\n";
-   if (!this->running.empty()) {
+    if (!this->running.empty()) {
         Process p = this->running.front();
-		//cout << "p.pid: " << p.pid;
-		//struct timeval stop;
-		//gettimeofday(&stop, NULL);
-		//cout << "ready to switch" << endl;
         if (pauseProcess(p) < 0) 
             fprintf(stdout, "pauseProcess failed\n");
-		this->waiting.push_back(p);
-		//cout << "waiting size: " << this->waiting.size() << endl;
-		//cout << "running size: " << this->running.size() << endl;
+        this->waiting.push_back(p);
         this->running.pop_front();
    }
-  // cout << "middle of robin runner\n";
-   // Move processes from waiting queue to running queue
    while (!this->waiting.empty() && this->running.size() < nCPUS) {
-		//cout << "before waiting front\n";
-		//cout << "pid: " << this->waiting.front().pid << endl;
-        //Process p = this->waiting.front();
-		//cout << "before if\n";
         if (this->waiting.front().pid == 0){
-		//	cout << "after if\n";
-            this->executeJob();
-          //  cout << "after execute job\n";
+            this->executeJob(); 
         }else {
-			//cout << "beforeresumeprocess\n";
             resumeProcess(this->waiting.front());
-			//cout << "afterresumeprocess\n";
             this->running.push_back(this->waiting.front());
             this->waiting.pop_front();
         }
    }
-   //cout << "end of robin runner\n";
 }
 
+//mlfq_runner
+//runs the mlfq policy scheduler
 void Scheduler::mlfq_runner() {
-	Process p;	
-	//cout << "before running empty check\n";
-	if (!this->running.empty()){
-		p = this->running.front();
-		this->running.pop_front();
-		if (p.utime > p.allotment){
-			p.allotment+=30;
-			p.priority = min(p.priority+1, num_levels-1);
-		}
-		pauseProcess(p);
-		this->levels[p.priority].push_back(p);
-	}
-	//cout << "before priority boost\n";
-	if (time(NULL) != prev_time && time(NULL) % 5 == 0){
-		//cout << "PRIORITYBOOST!!!!\n";
-		prev_time = time(NULL);
-		for (uint i = 0; i < 8; i++){
-			while (!levels[i].empty()){
-				p = levels[i].front();
-				p.priority = 0;
-				levels[i].pop_front();
-				levels[0].push_back(p);
-			}
-		}
-	}
-	while (!this->waiting.empty()){
-		p = this->waiting.front();
-		this->waiting.pop_front();
-		levels[0].push_back(p);
-	}
-	for (uint i = 0; i < 8; i++){
-		
-		while (!levels[i].empty() && this->running.size() < nCPUS){
-			p = levels[i].front();
-			levels[i].pop_front();
-			if (p.pid == 0){
-				MLFQexecuteJob(p);
-			}else{
-				resumeProcess(p);
-			}
-			this->running.push_back(p);
-		}
-	}
+    Process p;	
+    if (!this->running.empty()){
+        p = this->running.front();
+        this->running.pop_front();
+        if (p.utime > p.allotment){
+            p.allotment+=30;
+            p.priority = min(p.priority+1, num_levels-1);
+        }
+        pauseProcess(p);
+        this->levels[p.priority].push_back(p);
+    }
+    if (time(NULL) != prev_time && time(NULL) % 5 == 0){
+        prev_time = time(NULL);
+        for (uint i = 0; i < 8; i++){
+            while (!levels[i].empty()){
+                p = levels[i].front();
+                p.priority = 0;
+                levels[i].pop_front();
+                levels[0].push_back(p);
+            }
+        }
+    }
+    while (!this->waiting.empty()){
+        p = this->waiting.front();
+        this->waiting.pop_front();
+        levels[0].push_back(p);
+    }
+    for (uint i = 0; i < 8; i++){	
+        while (!levels[i].empty() && this->running.size() < nCPUS){
+            p = levels[i].front();
+            levels[i].pop_front();
+            if (p.pid == 0){
+                MLFQexecuteJob(p);
+            }else{
+                resumeProcess(p);
+            }
+            this->running.push_back(p);
+        }
+    }
 }
 
 deque<Process> Scheduler::get_waiting(){
-	return waiting;
+    return waiting;
 }
 
 deque<Process> Scheduler::get_running(){
-	return this->running;
+    return this->running;
 }
 
 Policy Scheduler::get_policy(){
-	return policy;
+    return policy;
 }
 
 int Scheduler::get_nCPUS(){
-	return nCPUS;
+    return nCPUS;
 }
 
 int Scheduler::get_total_processes(){
-	return total_processes;
+    return total_processes;
 }
 
 void Scheduler::set_total_processes(int num){
-	total_processes = num;
+    total_processes = num;
 }
 
 int Scheduler::get_num_running_processes(){
-	return num_running_processes;
+    return num_running_processes;
 }
 
 void Scheduler::set_num_running_processes(int num){
-	num_running_processes = num;
+    num_running_processes = num;
 }
 
 int Scheduler::get_num_waiting_processes(){
-	return num_waiting_processes;
+    return num_waiting_processes;
 }
 
 void Scheduler::set_num_waiting_processes(int num){
-	num_waiting_processes = num;
+    num_waiting_processes = num;
 }
 
 int Scheduler::get_num_levels(){
-	return num_levels;
+    return num_levels;
 }
 
 void Scheduler::set_num_levels(int num){
-	num_levels = num;
+    num_levels = num;
 }
 
 int Scheduler::get_average_turnaround_time(){
-	return average_turnaround_time;
+    return average_turnaround_time;
 }
 
 void Scheduler::set_average_turnaround_time(){
-	average_turnaround_time = float(total_turnaround_time) / float(total_dead_processes);
+    average_turnaround_time = float(total_turnaround_time) / float(total_dead_processes);
 }
 
 int Scheduler::get_average_response_time(){
-	return average_response_time;
+    return average_response_time;
 }
 
 void Scheduler::set_average_response_time(int num){
-	average_response_time = num;
+    average_response_time = num;
 }
 
 deque<Process> Scheduler::get_level(int index){
-	return levels[index];
+    return levels[index];
 }
 
 void Scheduler::increment_dead_processes(){
-	total_dead_processes++;
+    total_dead_processes++;
 }
 
 void Scheduler::add_to_total_turnaround_time(unsigned int num){
-	total_turnaround_time += num;
+    total_turnaround_time += num;
+}
+
+void Scheduler::flush_jobs(){
+    while(!this->running.empty()){
+        terminateProcess(this->running.front());
+        //num_running_processes--;
+        this->running.pop_front();
+    }
+
+    if (policy == mlfq){
+        for (uint i = 0; i < 8; i++){
+            while (!this->levels[i].empty()){
+                if(this->levels[i].front().pid == 0){
+                    this->levels[i].pop_front();
+                    num_waiting_processes--;
+                }else{
+                    terminateProcess(this->levels[i].front());
+                    this->levels[i].pop_front();
+                    num_waiting_processes--;
+                }
+            }
+        }
+    }else{
+        while (!this->waiting.empty()){
+            if(this->waiting.front().pid == 0){
+                this->waiting.pop_front();
+                num_waiting_processes--;
+            }else{
+                terminateProcess(this->waiting.front());
+                this->waiting.pop_front();
+                num_waiting_processes--;
+            }
+        }
+    }
+
 }

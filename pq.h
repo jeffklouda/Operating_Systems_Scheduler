@@ -32,9 +32,10 @@ struct Process {
     time_t            runtime;            //Time when process was last continued
     suseconds_t       schedtime;          //Time when process was first scheduled
     int               user;               //User (UNUSED)
-    int               allotment;          //Current allotment of usertime
+    unsigned int      allotment;          //Current allotment of usertime
     float             response_time;      //Response time (I think UNUSED)
     int               turnaround_time;    //Turnaround time (I think UNUSED)
+    char              status_char;        //Contains the status of the program
 };
 
 //Scheduler class
@@ -77,6 +78,7 @@ class Scheduler {
         int             MLFQexecuteJob(Process&);
         void            increment_dead_processes();
         void            add_to_total_turnaround_time(unsigned int);
+        void            flush_jobs();
 
     private:
         unsigned int    total_processes;
@@ -110,5 +112,6 @@ void running_log(int);
 void waiting_log(int);
 void flush_log();
 void reap_log(Process, int, int);
+void start_process_log(Process);
 
 #endif
