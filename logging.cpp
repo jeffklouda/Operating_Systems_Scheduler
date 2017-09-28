@@ -5,8 +5,11 @@
  * Authors: Matthew D'Alonzo and Jeff Klouda
  */
 
-#include <time.h>
+//Necessary Includes
+
 #include "pq.h"
+
+#include <time.h>
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -17,30 +20,35 @@
 #include <sstream>
 
 using namespace std;
+
 extern Scheduler scheduler_prime;
 
 string print_waiting_processes(){
 
-	deque<Process> current_waiting_table = scheduler_prime.get_waiting();
+    deque<Process> current_waiting_table = scheduler_prime.get_waiting();
 
-	string command_to_print;
-	stringstream ss;	
-	
-	for (uint i = 0; i < current_waiting_table.size(); i++){
-		ss << setw(5) << right;
-		ss << current_waiting_table[i].pid;
-		ss << " ";
-		ss << setw(20) << left;
-		command_to_print = "";
-		for (uint j = 0; j < current_waiting_table[i].command.size(); j++){
-			if (j != 0){
-				command_to_print += " ";
-			}
-			command_to_print += current_waiting_table[i].command[j];			
-		}
-		ss << command_to_print;
-		ss << " ";
-		ss << setw(8);
+    string command_to_print;
+    stringstream ss;	
+
+    for (uint i = 0; i < current_waiting_table.size(); i++){
+        ss << setw(5) << right << current_waiting_table[i].pid;
+        ss << " ";
+        ss << setw(20) << left;
+        command_to_print = "";
+        for (uint j = 0; j < current_waiting_table[i].command.size(); j++){
+            if (j != 0){
+                command_to_print += " ";
+            }
+            command_to_print += current_waiting_table[i].command[j];			
+        }
+
+        if (command_to_print.size() > 14){
+            command_to_print.erase(command_to_print.begin(), command_to_print.begin()+command_to_print.size()-14);
+            command_to_print = "(...)" + command_to_print;
+        }
+        ss << command_to_print;
+        ss << " ";
+        ss << setw(8);
     
         switch (current_waiting_table[i].status_char){
             case ('A'): ss << "Waiting";
@@ -70,27 +78,25 @@ string print_waiting_processes(){
             default:    ss << "Unknown";
                         break;
         }
-
-		ss << current_waiting_table[i].status;
-		ss << " ";
-		ss << setw(8);
-		ss << current_waiting_table[i].utime;
-		ss << " ";
-		ss << setw(9);
-		ss << current_waiting_table[i].priority;
-		ss << " ";		
-		ss << setw(8);
+        ss << " ";
+        ss << setw(8);
+        ss << current_waiting_table[i].utime;
+        ss << " ";
+        ss << setw(9);
+        ss << current_waiting_table[i].priority;
+        ss << " ";		
+        ss << setw(8);
         ss << "0";
-		ss << " ";
-		ss << setw(9);
-		ss << current_waiting_table[i].schedtime;
-		ss << " ";
-		ss << setw(9);
-		ss << current_waiting_table[i].starttime;
-		ss << endl;
-	}
-	string ss_string = ss.str();
-	return ss_string;
+        ss << " ";
+        ss << setw(9);
+        ss << current_waiting_table[i].schedtime;
+        ss << " ";
+        ss << setw(9);
+        ss << current_waiting_table[i].starttime;
+        ss << endl;
+    }
+    string ss_string = ss.str();
+    return ss_string;
 }
 
 string print_waiting_processes_mlfq(){
@@ -119,10 +125,15 @@ string print_waiting_processes_mlfq(){
 				}
 				command_to_print += current_waiting_table[i].command[j];			
 			}
-			ss << command_to_print;
-			ss << " ";
-			ss << setw(8);
-
+            
+            if (command_to_print.size() > 14){
+                command_to_print.erase(command_to_print.begin(), command_to_print.begin()+command_to_print.size()-14);
+                command_to_print = "(...)" + command_to_print;
+            }
+            ss << command_to_print;
+            ss << " ";
+            ss << setw(8);
+            
         switch (current_waiting_table[i].status_char){
             case ('A'): ss << "Waiting";
                         break;
@@ -195,6 +206,13 @@ string print_running_processes(){
 			}
 			command_to_print += current_process_table[i].command[j];			
 		}
+
+        if (command_to_print.size() > 14){
+            command_to_print.erase(command_to_print.begin(), command_to_print.begin()+command_to_print.size()-14);
+            command_to_print = "(...)" + command_to_print;
+        }
+        
+
 		ss << command_to_print;
 		ss << " ";
 		ss << setw(8);
