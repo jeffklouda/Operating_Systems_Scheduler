@@ -185,6 +185,6 @@ int main(int argc, char *argv[]) {
         } else if (result_1 == 0){
             scheduler_prime.run();
         }		
-    }    
+    }   
     return EXIT_SUCCESS;
 }

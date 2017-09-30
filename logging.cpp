@@ -258,7 +258,10 @@ string print_running_processes(){
 		ss << " ";		
 		ss << setw(8);
 		//TODO: Calculate USAGE
-        float usage = current_process_table[i].utime / (time(NULL) - current_process_table[i].starttime);
+        float usage = 0;
+        if (time(NULL)-current_process_table[i].starttime != 0){
+            usage = current_process_table[i].utime / (time(NULL) - current_process_table[i].starttime);
+        }
         ss << to_string(usage);
 
 		ss << " ";
