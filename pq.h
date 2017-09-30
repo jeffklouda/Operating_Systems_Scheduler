@@ -65,9 +65,9 @@ class Scheduler {
         void            set_num_waiting_processes(int);
         int             get_num_levels();
         void            set_num_levels(int);
-        int             get_average_turnaround_time();
+        double          get_average_turnaround_time();
         void            set_average_turnaround_time();
-        int             get_average_response_time();
+        double          get_average_response_time();
         void            set_average_response_time(int);
         void            fifo_runner();
         void            rRobin_runner();
@@ -89,8 +89,8 @@ class Scheduler {
         unsigned int    total_turnaround_time;
         unsigned int    total_response_time;
         int             num_levels;
-        float           average_response_time;
-        float           average_turnaround_time;
+        double           average_response_time;
+        double          average_turnaround_time;
         unsigned int    nCPUS;
         time_t          timeSlice;
         Policy          policy;

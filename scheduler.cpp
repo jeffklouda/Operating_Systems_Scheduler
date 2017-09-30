@@ -393,15 +393,15 @@ void Scheduler::set_num_levels(int num){
     num_levels = num;
 }
 
-int Scheduler::get_average_turnaround_time(){
+double Scheduler::get_average_turnaround_time(){
     return average_turnaround_time;
 }
 
 void Scheduler::set_average_turnaround_time(){
-    average_turnaround_time = float(total_turnaround_time) / float(total_dead_processes);
+    average_turnaround_time = (double)total_turnaround_time / (double)total_dead_processes;
 }
 
-int Scheduler::get_average_response_time(){
+double Scheduler::get_average_response_time(){
     return average_response_time;
 }
 
