@@ -15,14 +15,20 @@ command[6] = commandBase + "mixed.sh";
 command[7] = commandBase + "mixed-staggered.sh";
 command[8] = commandBase + "mixed-stampede.sh";
 command[9] = commandBase + "short.sh";
+
+if (len(sys.argv) < 2):
+    print "Please enter number of command as an argument"
+    print "Commands: "
+    for i, co in enumerate(command):
+        print i,
+        print ": ",
+        print command[i]
+    exit(1)
+
 commandNo = int(sys.argv[1])
-# launch server
 os.chdir("/tmp/")
 print sys.argv
-#os.system("~/CSE_2017-2018/cse_30341/cse-30341-fa17-project02/pq -f mdalonz1.pq");
 print "Executing ",
 print command[commandNo]
-#command[i] += " > ~/logfile.txt"
 os.system(command[commandNo]);
-exit
-#> ~/CSE_2017-2018/cse30341/cse-30341-fa17-project02/testfile.txt");
+exit(0)
