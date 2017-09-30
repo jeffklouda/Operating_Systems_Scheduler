@@ -200,11 +200,10 @@ int Scheduler::MLFQexecuteJob (Process &p) {
 
             p.pid = pid;
             p.starttime = time(NULL);
-
             struct timeval start;
             gettimeofday(&start, NULL);
             p.runtime = start.tv_usec;
-
+            
             start_process_log(this->waiting.front());
 
             break;
@@ -317,7 +316,7 @@ void Scheduler::mlfq_runner() {
     }
     if (time(NULL) != prev_time && time(NULL) % 5 == 0){
         prev_time = time(NULL);
-        for (uint i = 0; i < 8; i++){
+        for (uint i = 1; i < 8; i++){
             while (!levels[i].empty()){
                 p = levels[i].front();
                 p.priority = 0;
@@ -370,7 +369,7 @@ void Scheduler::set_total_processes(int num){
 }
 
 int Scheduler::get_num_running_processes(){
-    return num_running_processes;
+    return this->running.size();
 }
 
 void Scheduler::set_num_running_processes(int num){
