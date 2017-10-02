@@ -170,17 +170,24 @@ Demonstration
 -------------
 
 > Place a link to your demonstration slides on [Google Drive].
+>
+> https://docs.google.com/presentation/d/1hRTaXGt0vAknObfi1Rqx9jl_nGMD1qtsE0awJ09ZHfY/edit?usp=sharing
+>
 
 Errata
 ------
 
 > Describe any known errors, bugs, or deviations from the requirements.
 
+No known deviations from the requirements.
+
 Extra Credit
 ------------
 
 > Describe what extra credit (if any) that you implemented.
-
+>
+> No Extra Credit
+>
 
 
 
