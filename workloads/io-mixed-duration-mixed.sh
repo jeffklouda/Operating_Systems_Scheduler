@@ -1,14 +1,14 @@
-#!/bin/sh
+#/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/bi/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/sh
 
-./pq add ./worksim.py 0.1 1
-./pq add ./worksim.py 0.1 5
-./pq add ./worksim.py 0.1 30
-./pq add ./worksim.py 0.5 1
-./pq add ./worksim.py 0.5 5
-./pq add ./worksim.py 0.5 30
-./pq add ./worksim.py 0.9 1
-./pq add ./worksim.py 0.9 5
-./pq add ./worksim.py 0.9 30
-./pq add ./worksim.py 0.9 1
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.1 1
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.1 5
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.1 30
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.5 1
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.5 5
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.5 30
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.9 1
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.9 5
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.9 30
+/afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq add /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/worksim.py 0.9 1
 
-watch ./pq status
+watch /afs/nd.edu/user28/mdalonz1/Operating_Systems/cse-30341-fa17-project02/pq status

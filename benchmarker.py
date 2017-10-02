@@ -15,6 +15,7 @@ command[6] = commandBase + "mixed.sh";
 command[7] = commandBase + "mixed-staggered.sh";
 command[8] = commandBase + "mixed-stampede.sh";
 command[9] = commandBase + "short.sh";
+command[10] = commandBase + "tester.sh";
 
 if (len(sys.argv) < 2):
     print "Please enter number of command as an argument"
