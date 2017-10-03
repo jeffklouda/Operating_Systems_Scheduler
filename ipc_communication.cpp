@@ -31,7 +31,7 @@ using namespace std;
 
 #define streq(a, b) (strcmp(a, b) == 0)
 
-#define SOCKET_PATH "pq.mdalonz1"
+extern string PATH;
 
 int server_create(){
 	vector<string> messages;
@@ -45,7 +45,7 @@ int server_create(){
 
 	// Bind socket
 	struct sockaddr_un server_addr { .sun_family = AF_UNIX };
-	strcpy(server_addr.sun_path, SOCKET_PATH);
+	strcpy(server_addr.sun_path, PATH.c_str());
 	socklen_t server_len = strlen(server_addr.sun_path) + sizeof(server_addr.sun_family);
 	if (bind(server_fd, (struct sockaddr *)&server_addr, server_len) < 0) {
 		perror("bind");
@@ -114,7 +114,7 @@ void server_accept(int server_fd){
 
 void client_request(vector<string> command){
 	struct sockaddr_un server_addr { .sun_family = AF_UNIX };
-	strcpy(server_addr.sun_path, SOCKET_PATH);
+	strcpy(server_addr.sun_path, PATH.c_str());
 	size_t server_len = strlen(server_addr.sun_path) + sizeof(server_addr.sun_family);
 
     // Create socket
