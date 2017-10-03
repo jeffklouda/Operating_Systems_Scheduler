@@ -204,7 +204,7 @@ int Scheduler::MLFQexecuteJob (Process &p) {
             gettimeofday(&start, NULL);
             p.runtime = start.tv_usec;
             
-            start_process_log(this->waiting.front());
+            start_process_log(p);
 
             break;
     }
@@ -274,7 +274,7 @@ void Scheduler::run() {
 //fifo_runner
 //runs the fifo policy scheduler
 void Scheduler::fifo_runner() {
-    while (num_running_processes < nCPUS && this->jobsWaiting()) {
+    while (this->running.size() < nCPUS && this->jobsWaiting()) {
         this->executeJob();
     }
 }
